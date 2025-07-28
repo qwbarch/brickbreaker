@@ -15,24 +15,33 @@ public class Main implements ApplicationListener {
     /**
      * Update the game's logic at a fixed 30 updates per second.
      */
-    public static float SECONDS_PER_TICK = 1f / 15f;
+    private final static float SECONDS_PER_TICK = 1f / 15f;
+
+    /**
+     * World width using in-game units.
+     */
+    private final static float WORLD_WIDTH = 100f;
+
+    /**
+     * World height using in-game units.
+     */
+    private final static float WORLD_HEIGHT = 100f;
 
     private ScreenHandler screenHandler;
 
-    // private SpriteBatch batch;
-    // private Texture image;
-
     @Override
     public void create() {
-        // batch = new SpriteBatch();
-        // image = new Texture("libgdx.png");
-
         // Startup dependency injection.
         var clientComponent = DaggerClientComponent.create();
         var screenComponent =
                 DaggerScreenComponent
                     .factory()
-                    .create(clientComponent, SECONDS_PER_TICK);
+                    .create(
+                        clientComponent,
+                        SECONDS_PER_TICK,
+                        WORLD_WIDTH,
+                        WORLD_HEIGHT
+                    );
         screenHandler = screenComponent.getScreenHandler();
 
         // Start the loading screen.

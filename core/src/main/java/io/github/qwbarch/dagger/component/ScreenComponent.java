@@ -25,7 +25,9 @@ public interface ScreenComponent {
     interface Factory {
         ScreenComponent create(
             ClientComponent clientComponent,
-            @BindsInstance @Named("secondsPerTick") float secondsPerTick
+            @BindsInstance @Named("secondsPerTick") float secondsPerTick,
+            @BindsInstance @Named("worldWidth") float worldWidth,
+            @BindsInstance @Named("worldHeight") float worldHeight
         );
     }
 }

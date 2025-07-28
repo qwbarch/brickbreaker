@@ -9,6 +9,7 @@ import javax.inject.Inject;
 @ScreenScope
 public final class AssetMap {
     private static final String BALL_TEXTURE_PATH = "ball.png";
+    private static final String PADDLE_TEXTURE_PATH = "paddle.jpg";
 
     private final AssetManager assetManager = new AssetManager();
     private boolean finishedLoading = false;
@@ -24,6 +25,7 @@ public final class AssetMap {
     public void loadAssets() {
         if (!finishedLoading) {
             assetManager.load(BALL_TEXTURE_PATH, Texture.class);
+            assetManager.load(PADDLE_TEXTURE_PATH, Texture.class);
         }
     }
 
@@ -53,5 +55,9 @@ public final class AssetMap {
 
     public Texture getBallTexture() {
         return assetManager.get(BALL_TEXTURE_PATH, Texture.class);
+    }
+
+    public Texture getPaddleTexture() {
+       return assetManager.get(PADDLE_TEXTURE_PATH, Texture.class);
     }
 }

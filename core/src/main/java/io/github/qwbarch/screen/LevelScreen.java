@@ -15,27 +15,37 @@ import io.github.qwbarch.entity.component.LinearVelocity;
 import io.github.qwbarch.entity.component.Position;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @ScreenScope
 public final class LevelScreen implements Screen {
-    public static float WORLD_WIDTH = 100f;
-    public static float WORLD_HEIGHT = 100f;
-
     private final World world;
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final EntitySpawner spawner;
+    private final float worldWidth;
+    private final float worldHeight;
 
+    private Viewport viewport;
     private Camera camera = new OrthographicCamera();
-    private Viewport viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
     private FPSLogger fpsLogger = new FPSLogger();
 
     @Inject
-    LevelScreen(World world, AssetMap assets, SpriteBatch batch, EntitySpawner spawner) {
+    LevelScreen(
+        World world,
+        AssetMap assets,
+        SpriteBatch batch,
+        EntitySpawner spawner,
+        @Named("worldWidth") float worldWidth,
+        @Named("worldHeight") float worldHeight
+    ) {
         this.world = world;
         this.assets = assets;
         this.batch = batch;
         this.spawner = spawner;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
+        viewport = new FitViewport(worldWidth, worldHeight, camera);
         //var entityId = world.create();
         // var position = world.edit(entityId).create(Position.class);
         // var velocity = world.edit(entityId).create(LinearVelocity.class);
@@ -48,7 +58,8 @@ public final class LevelScreen implements Screen {
         //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        spawner.spawnBall(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f);
+        spawner.spawnBall(worldWidth / 2f, worldHeight / 2f);
+        spawner.spawnPaddle();
 
         System.out.println(world.getSystems());
 

@@ -19,4 +19,12 @@ public final class LinearVelocity extends Component {
         this.y = y;
         return this;
     }
+
+    public void reverseX() {
+        x = -x;
+    }
+
+    public void reverseY() {
+        y = -y;
+    }
 }
