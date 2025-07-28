@@ -3,6 +3,7 @@ package io.github.qwbarch;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import io.github.qwbarch.dagger.component.DaggerClientComponent;
 import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
@@ -18,6 +19,7 @@ public class Main implements ApplicationListener {
         // image = new Texture("libgdx.png");
 
         // Startup dependency injection.
+        var clientComponent = DaggerClientComponent.create();
         var screenComponent = DaggerScreenComponent.create();
         screenHandler = screenComponent.getScreenHandler();
 

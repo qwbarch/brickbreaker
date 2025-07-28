@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 @ScreenScope
 public class ScreenHandler implements Disposable {
-
     /**
      * The currently visible screen.
      */
@@ -34,6 +33,7 @@ public class ScreenHandler implements Disposable {
      * Adds a reference to the screen.
      *
      * @param screen The screen to add to the screen handler.
+     * @return Reference to this screen handler to allow chaining method calls.
      */
     public ScreenHandler add(Screen screen) {
         screens.add(screen);
@@ -45,9 +45,8 @@ public class ScreenHandler implements Disposable {
      *
      * @param screen The screen to remove from the screen handler.
      */
-    public ScreenHandler remove(Screen screen) {
+    public void remove(Screen screen) {
         screens.remove(screen);
-        return this;
     }
 
     /**

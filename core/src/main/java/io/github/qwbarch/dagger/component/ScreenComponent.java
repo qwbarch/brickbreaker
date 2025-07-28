@@ -9,6 +9,7 @@ import io.github.qwbarch.screen.ScreenHandler;
 @ScreenScope
 public interface ScreenComponent {
     ScreenHandler getScreenHandler();
+
     LoadingScreen getLoadingScreen();
 
     @Component.Factory
