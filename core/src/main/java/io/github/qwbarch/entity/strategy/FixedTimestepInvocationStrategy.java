@@ -2,7 +2,7 @@ package io.github.qwbarch.entity.strategy;
 
 import com.artemis.BaseSystem;
 import com.artemis.SystemInvocationStrategy;
-import com.badlogic.gdx.utils.ArrayMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import io.github.qwbarch.entity.system.LogicSystem;
 import io.github.qwbarch.entity.system.RenderSystem;
 
@@ -11,7 +11,18 @@ import javax.inject.Named;
 
 /**
  * Implements a fixed timestep game loop.
- * https://gafferongames.com/post/fix_your_timestep/
+ * <a href="https://gafferongames.com/post/fix_your_timestep/">Fix your timestep by Gaffer On Games</a>
+ * <p>
+ * Why are OrderedMaps used for mapping the systems to their "enabled" flag?
+ * <p>
+ * Firstly, I need o(1) lookup on the keys. According to LibGDX, OrderedMaps rarely degrades to o(n).
+ * Secondly, I need quick iteration over the keys and values. Ordered maps are simply much more efficient for
+ * the tight iteration cycles that this class performs.
+ * Thirdly, LibGDX collections such as OrderedMap pools the iterator object when possible, avoiding unnecessary
+ * stress on the garbage collector.
+ * <p>
+ * These maps are set to unordered via a property since I don't actually care about the iteration order
+ * of these systems. OrderedMap set to unordered still iterates faster than ObjectMap.
  */
 public final class FixedTimestepInvocationStrategy extends SystemInvocationStrategy {
     /**
@@ -23,13 +34,13 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
      * Systems that run at a fixed timestep.
      * The mapped values indicates whether the system is enabled or not.
      */
-    private ArrayMap<BaseSystem, Boolean> logicSystems = new ArrayMap<>();
+    private OrderedMap<BaseSystem, Boolean> logicSystems = new OrderedMap<>();
 
     /**
      * Systems that run as often as possible.
      * The mapped values indicate whether the system is enabled or not.
      */
-    private ArrayMap<BaseSystem, Boolean> defaultSystems = new ArrayMap<>();
+    private OrderedMap<BaseSystem, Boolean> defaultSystems = new OrderedMap<>();
 
     /**
      * Accumulator used for a fixed time-step implementation.
@@ -46,7 +57,7 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
         this.secondsPerTick = secondsPerTick;
     }
 
-    private ArrayMap<BaseSystem, Boolean> isEnabledForSystem(BaseSystem system) {
+    private OrderedMap<BaseSystem, Boolean> isEnabledForSystem(BaseSystem system) {
         if (system instanceof LogicSystem) return logicSystems;
         else return defaultSystems;
     }
@@ -54,18 +65,20 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
     @Override
     public void initialize() {
         for (var system : systems.getData()) {
-           setEnabled(system, true);
+            setEnabled(system, true);
         }
     }
 
     @Override
     public boolean isEnabled(BaseSystem system) {
-        return isEnabledForSystem(system).containsKey(system);
+        return system != null && isEnabledForSystem(system).containsKey(system);
     }
 
     @Override
     public void setEnabled(BaseSystem system, boolean enabled) {
-        isEnabledForSystem(system).put(system, enabled);
+        if (system != null) {
+            isEnabledForSystem(system).put(system, enabled);
+        }
     }
 
     @Override
@@ -89,10 +102,10 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
         while (accumulator >= secondsPerTick) {
             accumulator -= secondsPerTick;
             for (var i = 0; i < logicSystems.size; i++) {
-                // If the logic system is enabled.
-                if (logicSystems.values[i]) {
-                    // Process the logic system and update its entities.
-                    logicSystems.keys[i].process();
+                // If the logic system is enabled, process it.
+                var system = logicSystems.orderedKeys().get(i);
+                if (logicSystems.get(system)) {
+                    system.process();
                     updateEntityStates();
                 }
             }
@@ -101,9 +114,10 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
 
     private void processDefaultSystems() {
         for (var i = 0; i < defaultSystems.size; i++) {
-            // If the default system is enabled.
-            if (defaultSystems.values[i]) {
-                var system = defaultSystems.keys[i];
+            // If the default system is enabled, process it.
+            var system = defaultSystems.orderedKeys().get(i);
+            if (defaultSystems.get(system)) {
+                // Update the alpha value if the system is a RenderSystem.
                 if (system instanceof RenderSystem) {
                     ((RenderSystem) system).alpha = accumulator / secondsPerTick;
                 }

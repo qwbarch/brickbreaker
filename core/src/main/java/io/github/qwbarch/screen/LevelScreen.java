@@ -24,9 +24,9 @@ public final class LevelScreen implements Screen {
     @Inject
     LevelScreen(World world) {
         this.world = world;
-        var entityId = world.create();
-        var position = world.edit(entityId).create(Position.class);
-        var velocity = world.edit(entityId).create(LinearVelocity.class);
+        //var entityId = world.create();
+        // var position = world.edit(entityId).create(Position.class);
+        // var velocity = world.edit(entityId).create(LinearVelocity.class);
     }
 
     @Override
@@ -43,6 +43,6 @@ public final class LevelScreen implements Screen {
     public void render() {
         viewport.apply(true);
 
-        world.process();
+        //world.process();
     }
 }
