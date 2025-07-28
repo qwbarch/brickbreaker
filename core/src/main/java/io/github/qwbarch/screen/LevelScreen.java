@@ -3,16 +3,14 @@ package io.github.qwbarch.screen;
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.scope.ScreenScope;
+import io.github.qwbarch.entity.EntitySpawner;
 import io.github.qwbarch.entity.component.LinearVelocity;
 import io.github.qwbarch.entity.component.Position;
 
@@ -26,17 +24,18 @@ public final class LevelScreen implements Screen {
     private final World world;
     private final AssetMap assets;
     private final SpriteBatch batch;
+    private final EntitySpawner spawner;
 
     private Camera camera = new OrthographicCamera();
     private Viewport viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
-
-    private Texture ballTexture;
+    private FPSLogger fpsLogger = new FPSLogger();
 
     @Inject
-    LevelScreen(World world, AssetMap assets, SpriteBatch batch) {
+    LevelScreen(World world, AssetMap assets, SpriteBatch batch, EntitySpawner spawner) {
         this.world = world;
         this.assets = assets;
         this.batch = batch;
+        this.spawner = spawner;
         //var entityId = world.create();
         // var position = world.edit(entityId).create(Position.class);
         // var velocity = world.edit(entityId).create(LinearVelocity.class);
@@ -45,9 +44,13 @@ public final class LevelScreen implements Screen {
     @Override
     public void show() {
         System.out.println("level screen");
-        ballTexture = assets.getBallTexture();
-        ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        //ballTexture = assets.getBallTexture();
+        //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        spawner.spawnBall(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f);
+
+        System.out.println(world.getSystems());
 
         //camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0f);
         //camera.update();
@@ -65,7 +68,11 @@ public final class LevelScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
+        // batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
+        world.process();
+
+        fpsLogger.log();
+
         batch.end();
     }
 }

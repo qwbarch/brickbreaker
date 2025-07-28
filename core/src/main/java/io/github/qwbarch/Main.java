@@ -15,7 +15,7 @@ public class Main implements ApplicationListener {
     /**
      * Update the game's logic at a fixed 30 updates per second.
      */
-    public static float SECONDS_PER_TICK = 1f / 30f;
+    public static float SECONDS_PER_TICK = 1f / 15f;
 
     private ScreenHandler screenHandler;
 
