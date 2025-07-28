@@ -10,6 +10,7 @@ public final class RenderModule {
     @Provides
     @ClientScope
     public SpriteBatch provideSpriteBatch() {
+        System.out.println("provideSpriteBatch");
         return new SpriteBatch();
     }
 }

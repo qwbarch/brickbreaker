@@ -6,5 +6,4 @@ import java.lang.annotation.RetentionPolicy;
 
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ClientScope {
-}
+public @interface ClientScope { }

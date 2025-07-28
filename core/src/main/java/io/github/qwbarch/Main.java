@@ -8,6 +8,11 @@ import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
 public class Main implements ApplicationListener {
+    /**
+     * Update the game's logic at a fixed 30 updates per second.
+     */
+    public static float SECONDS_PER_TICK = 1f / 30f;
+
     private ScreenHandler screenHandler;
 
     // private SpriteBatch batch;
@@ -20,7 +25,7 @@ public class Main implements ApplicationListener {
 
         // Startup dependency injection.
         var clientComponent = DaggerClientComponent.create();
-        var screenComponent = DaggerScreenComponent.create();
+        var screenComponent = DaggerScreenComponent.factory().create(SECONDS_PER_TICK);
         screenHandler = screenComponent.getScreenHandler();
 
         // Start the loading screen.
