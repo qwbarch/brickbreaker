@@ -46,6 +46,7 @@ public final class LevelScreen implements Screen {
     public void show() {
         System.out.println("level screen");
         ballTexture = assets.getBallTexture();
+        ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         //camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0f);
@@ -64,7 +65,7 @@ public final class LevelScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        batch.draw(ballTexture, WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 1f, 1f);
+        batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
         batch.end();
     }
 }
