@@ -1,13 +1,17 @@
 package io.github.qwbarch;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.qwbarch.dagger.component.DaggerClientComponent;
 import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
 public class Main implements ApplicationListener {
+    public static final Color DEFAULT_BACKGROUND_COLOR =
+        Color.valueOf("#525252"); // Gray color.
+
     /**
      * Update the game's logic at a fixed 30 updates per second.
      */
@@ -25,7 +29,10 @@ public class Main implements ApplicationListener {
 
         // Startup dependency injection.
         var clientComponent = DaggerClientComponent.create();
-        var screenComponent = DaggerScreenComponent.factory().create(SECONDS_PER_TICK);
+        var screenComponent =
+                DaggerScreenComponent
+                    .factory()
+                    .create(clientComponent, SECONDS_PER_TICK);
         screenHandler = screenComponent.getScreenHandler();
 
         // Start the loading screen.
@@ -44,8 +51,7 @@ public class Main implements ApplicationListener {
         // batch.draw(image, 140, 210);
         // batch.end();
 
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f); // Clear black screen.
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        ScreenUtils.clear(DEFAULT_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }
 
@@ -56,6 +62,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resume() {
+        System.out.println("resume called");
         screenHandler.getCurrentScreen().resume();
     }
 

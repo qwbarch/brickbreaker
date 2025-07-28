@@ -1,6 +1,9 @@
 package io.github.qwbarch.screen;
 
 import com.artemis.World;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
@@ -9,16 +12,27 @@ import javax.inject.Inject;
 public final class LoadingScreen implements Screen {
     private final ScreenHandler screenHandler;
     private final LevelScreen levelScreen;
+    private final AssetMap assets;
 
     @Inject
-    LoadingScreen(ScreenHandler screenHandler, LevelScreen levelScreen, World world) {
+    LoadingScreen(ScreenHandler screenHandler, LevelScreen levelScreen, AssetMap assets, World world, SpriteBatch batch) {
         this.screenHandler = screenHandler;
         this.levelScreen = levelScreen;
+        this.assets = assets;
     }
 
     @Override
     public void show() {
         System.out.println("loading screen");
-        screenHandler.setScreen(levelScreen);
+        assets.loadAssets();
+    }
+
+    @Override
+    public void render() {
+        assets.update();
+
+        if (assets.isFinishedLoading()) {
+            screenHandler.setScreen(levelScreen);
+        }
     }
 }
