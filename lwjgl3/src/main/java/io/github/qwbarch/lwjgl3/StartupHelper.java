@@ -32,6 +32,8 @@ import static org.lwjgl.system.JNI.invokePPZ;
 import static org.lwjgl.system.macosx.ObjCRuntime.objc_getClass;
 import static org.lwjgl.system.macosx.ObjCRuntime.sel_getUid;
 
+// TODO: ADD CITATION.
+
 /**
  * Adds some utilities to ensure that the JVM was started with the
  * {@code -XstartOnFirstThread} argument, which is required on macOS for LWJGL 3

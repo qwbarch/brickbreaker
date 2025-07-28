@@ -4,6 +4,9 @@ eclipse.project.name = appName + '-core'
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
+  implementation "com.google.dagger:dagger:$daggerVersion"
+  annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
