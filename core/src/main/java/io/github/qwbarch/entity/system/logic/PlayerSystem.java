@@ -1,35 +1,30 @@
 package io.github.qwbarch.entity.system.logic;
 
-import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.artemis.annotations.All;
-import com.artemis.managers.TagManager;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.LinearVelocity;
-import io.github.qwbarch.entity.component.Position;
-import io.github.qwbarch.entity.component.Size;
-import io.github.qwbarch.entity.component.flag.IsPlayer;
+import io.github.qwbarch.entity.component.Player;
 
 import javax.inject.Inject;
 
-import static io.github.qwbarch.entity.EntitySpawner.PADDLE_TAG;
-
 @ScreenScope
-@All(IsPlayer.class)
-public final class PlayerSystem extends IteratingSystem  {
+@All(Player.class)
+public final class PlayerSystem extends IteratingSystem {
     private static final float PADDLE_VELOCITY = 120f;
 
     private ComponentMapper<LinearVelocity> velocities;
 
     @Inject
-    PlayerSystem() {}
+    PlayerSystem() {
+    }
 
     @Override
     protected void process(int entityId) {
-        if (entityId < 0)  return;
+        if (entityId < 0) return;
 
         var velocity = velocities.get(entityId);
         var isLeftHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT);

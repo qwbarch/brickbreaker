@@ -2,11 +2,7 @@ package io.github.qwbarch.entity;
 
 import com.artemis.World;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.entity.component.LinearVelocity;
-import io.github.qwbarch.entity.component.Position;
-import io.github.qwbarch.entity.component.Size;
-import io.github.qwbarch.entity.component.Sprite;
-import io.github.qwbarch.entity.component.flag.IsPlayer;
+import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +32,8 @@ public final class EntitySpawner {
         var velocity = world.edit(entityId).create(LinearVelocity.class);
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
+        world.edit(entityId).create(WorldBounded.class);
+        world.edit(entityId).create(BounceCollider.class);
 
         position.current.set(x, y);
         position.previous.set(position.current);
@@ -46,7 +44,6 @@ public final class EntitySpawner {
 
         sprite.texture = assets.getBallTexture();
 
-        System.out.println("done spawning");
         return entityId;
     }
 
@@ -57,7 +54,8 @@ public final class EntitySpawner {
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
         world.edit(entityId).create(LinearVelocity.class);
-        world.edit(entityId).create(IsPlayer.class);
+        world.edit(entityId).create(Player.class);
+        world.edit(entityId).create(WorldBounded.class);
 
         position.current.x = worldWidth / 2f;
         position.current.y = 10f;
