@@ -13,6 +13,11 @@ import io.github.qwbarch.entity.system.LogicSystem;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+/**
+ * Handles the movement and collision of entities.<br />
+ * Why both at once? It was originally separated, but I couldn't figure out how to avoid the tunneling issue
+ * without doing multiple passes in a single game tick. <br />
+ */
 @ScreenScope
 @All({Position.class, LinearVelocity.class, Size.class})
 @One({Collider.class})
@@ -69,6 +74,10 @@ public final class MovementSystem extends LogicSystem {
         collidableEntities = collidableSubscription.getEntities();
     }
 
+    /**
+     * Called once per game tick on every entity that matches the specified aspects above
+     * (from the @All, @One, etc. annotations).
+     */
     @Override
     protected void process(int entityId) {
         // Get the components of the current entity to process.

@@ -11,29 +11,39 @@ import io.github.qwbarch.entity.component.Player;
 
 import javax.inject.Inject;
 
+/**
+ * Handles the player input of entities. This is currently only for the player's paddle.
+ */
 @ScreenScope
-@All(Player.class)
+@All({Player.class, LinearVelocity.class})
 public final class PlayerSystem extends IteratingSystem {
+    // The speed of the paddle.
     private static final float PADDLE_VELOCITY = 500;
 
+    // Component mappers are automatically injected via artemis-odb,
+    // which gives access to the entity's components.
     private ComponentMapper<LinearVelocity> velocities;
 
     @Inject
     PlayerSystem() {
     }
 
+    /**
+     * Called once per game tick on every entity that matches the specified aspects above
+     * (from the @All, @One, etc. annotations).
+     */
     @Override
     protected void process(int entityId) {
-        if (entityId < 0) return;
-
         var velocity = velocities.get(entityId);
         var isLeftHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         var isRightHeld = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
+        // If both left/right are held or neither are held, stop moving the paddle.
         if (isLeftHeld == isRightHeld) {
-            // If both left/right are held or neither are held, stop moving the paddle.
             velocity.x = 0;
-        } else {
+        }
+        // Otherwise move the paddle left/right.
+        else {
             velocity.x = isLeftHeld ? -PADDLE_VELOCITY : PADDLE_VELOCITY;
         }
     }
