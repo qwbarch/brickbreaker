@@ -32,6 +32,9 @@ public final class LoadingScreen implements Screen {
         assets.update();
 
         if (assets.isFinishedLoading()) {
+            var music = assets.getBackgroundMusic();
+            music.setLooping(0L, true);
+            music.play();
             screenHandler.setScreen(levelScreen);
         }
     }

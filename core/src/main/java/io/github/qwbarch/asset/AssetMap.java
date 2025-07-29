@@ -11,7 +11,13 @@ import javax.inject.Inject;
 public final class AssetMap {
     private static final String BALL_TEXTURE_PATH = "ball.png";
     private static final String PADDLE_TEXTURE_PATH = "paddle.jpg";
+
     private static final String GREY_BRICK_TEXTURE_PATH = "grey-brick.jpg";
+    private static final String RED_BRICK_TEXTURE_PATH = "red-brick.jpg";
+    private static final String YELLOW_BRICK_TEXTURE_PATH = "yellow-brick.jpg";
+    private static final String GREEN_BRICK_TEXTURE_PATH = "green-brick.jpg";
+
+    private static final String BACKGROUND_MUSIC_PATH = "background-music.mp3";
 
     private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
     private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
@@ -31,8 +37,13 @@ public final class AssetMap {
         if (!finishedLoading) {
             assetManager.load(BALL_TEXTURE_PATH, Texture.class);
             assetManager.load(PADDLE_TEXTURE_PATH, Texture.class);
-            assetManager.load(GREY_BRICK_TEXTURE_PATH, Texture.class);
 
+            assetManager.load(GREY_BRICK_TEXTURE_PATH, Texture.class);
+            assetManager.load(RED_BRICK_TEXTURE_PATH, Texture.class);
+            assetManager.load(YELLOW_BRICK_TEXTURE_PATH, Texture.class);
+            assetManager.load(GREEN_BRICK_TEXTURE_PATH, Texture.class);
+
+            assetManager.load(BACKGROUND_MUSIC_PATH, Sound.class);
             assetManager.load(BALL_SPAWN_SOUND_PATH, Sound.class);
             assetManager.load(HARD_BOUNCE_SOUND_PATH, Sound.class);
         }
@@ -72,6 +83,10 @@ public final class AssetMap {
 
     public Texture getGreyBrickTexture() {
         return assetManager.get(GREY_BRICK_TEXTURE_PATH, Texture.class);
+    }
+
+    public Sound getBackgroundMusic() {
+        return assetManager.get(BACKGROUND_MUSIC_PATH, Sound.class);
     }
 
     public Sound getBallSpawnSound() {
