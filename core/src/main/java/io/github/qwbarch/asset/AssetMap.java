@@ -85,6 +85,18 @@ public final class AssetMap {
         return assetManager.get(GREY_BRICK_TEXTURE_PATH, Texture.class);
     }
 
+    public Texture getGreenBrickTexture() {
+        return assetManager.get(GREEN_BRICK_TEXTURE_PATH, Texture.class);
+    }
+
+    public Texture getRedBrickTexture() {
+        return assetManager.get(RED_BRICK_TEXTURE_PATH, Texture.class);
+    }
+
+    public Texture getYellowBrickTexture() {
+        return assetManager.get(YELLOW_BRICK_TEXTURE_PATH, Texture.class);
+    }
+
     public Sound getBackgroundMusic() {
         return assetManager.get(BACKGROUND_MUSIC_PATH, Sound.class);
     }

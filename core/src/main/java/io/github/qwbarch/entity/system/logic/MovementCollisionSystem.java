@@ -6,7 +6,6 @@ import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
 import com.artemis.annotations.One;
 import com.artemis.utils.IntBag;
-import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.*;
 import io.github.qwbarch.entity.system.LogicSystem;
@@ -49,6 +48,7 @@ public final class MovementCollisionSystem extends LogicSystem {
     private ComponentMapper<Size> sizes;
     private ComponentMapper<Collider> colliders;
     private ComponentMapper<Collidable> collidables;
+    private ComponentMapper<CollisionListener> collisionListeners;
     private ComponentMapper<ImpactSound> impactSounds;
 
     // Allows us to iterate over collidable entities.
@@ -129,6 +129,7 @@ public final class MovementCollisionSystem extends LogicSystem {
             // E.g. using a quad tree to process only within one quadrant.
             for (var i = 0; i < collidableEntities.size(); i++) {
                 var collidableId = collidableEntities.get(i);
+
                 if (!collidables.has(collidableId)) continue;
 
                 var collidablePosition = positions.get(collidableId);
@@ -143,7 +144,9 @@ public final class MovementCollisionSystem extends LogicSystem {
                 // Collision detection of entities marked as a BouncySurface.
                 // https://lazyfoo.net/tutorials/SDL/27_collision_detection/index.php
 
-                // If entity collided with a collidable entity.
+                // If entity is within collision bounds.
+                // This doesn't necessarily mean a collision has happened,
+                // which requires the below checks to be exact.
                 if (
                     currentLeft < collidableRight
                         && currentRight > collidableLeft
@@ -157,7 +160,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                         if (collider.bounce) velocity.reverseX();
                         else velocity.setZero();
 
-                        playImpact(collidableId, collider);
+                        handleCollision(entityId, collidableId);
                     }
                     // Collided into the right of the entity.
                     else if (previousLeft >= collidableRight) {
@@ -166,7 +169,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                         if (collider.bounce) velocity.reverseX();
                         else velocity.setZero();
 
-                        playImpact(collidableId, collider);
+                        handleCollision(entityId, collidableId);
                     }
                     // Collided into the bottom of the entity.
                     else if (previousTop <= collidableBottom) {
@@ -175,14 +178,14 @@ public final class MovementCollisionSystem extends LogicSystem {
                         if (collider.bounce) velocity.reverseY();
                         else velocity.setZero();
 
-                        playImpact(collidableId, collider);
+                        handleCollision(entityId, collidableId);
                     } else if (previousBottom >= collidableTop) {
                         position.current.y = collidableTop;
 
                         if (collider.bounce) velocity.reverseY();
                         else velocity.setZero();
 
-                        playImpact(collidableId, collider);
+                        handleCollision(entityId, collidableId);
                     }
 
                     // Stop processing entities, since the object already collided into an entity.
@@ -192,8 +195,12 @@ public final class MovementCollisionSystem extends LogicSystem {
         }
     }
 
-    private void playImpact(int collidableId, Collider collider) {
-        if (collider.playImpactSound && impactSounds.has(collidableId)) {
+    /**
+     * Play the impact sound if it isn't on cooldown already.
+     */
+    private void handleCollision(int colliderId, int collidableId) {
+        // Play the impact sound if it isn't currently on cooldown.
+        if (colliders.get(colliderId).playImpactSound && impactSounds.has(collidableId)) {
             var impactSound = impactSounds.get(collidableId);
             var currentTime = System.nanoTime();
             var timeSinceLastPlayed = (currentTime - impactSound.lastPlayedTime) / 1_000_000_000f;
@@ -201,6 +208,11 @@ public final class MovementCollisionSystem extends LogicSystem {
                 impactSound.lastPlayedTime = currentTime;
                 impactSound.sound.play();
             }
+        }
+
+        // Run the collision listener function.
+        if (collisionListeners.has(collidableId)) {
+            collisionListeners.get(collidableId).listener.collide(colliderId, collidableId);
         }
     }
 }

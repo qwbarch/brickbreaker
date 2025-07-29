@@ -1,6 +1,7 @@
 package io.github.qwbarch.entity;
 
 import com.artemis.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.component.*;
 
@@ -87,21 +88,77 @@ public final class EntitySpawner {
         impactSound.lastPlayedTime = 0f;
     }
 
-    public void spawnBrick(float x, float y, int hitpoints) {
+    public void spawnBrick(float x, float y) {
+        spawnBrick(x, y, -1);
+    }
+
+    public void spawnBrick(float x, float y, int startHitpoints) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
         var impactSound = world.edit(entityId).create(ImpactSound.class);
+        var collisionListener = world.edit(entityId).create(CollisionListener.class);
+        var hitpoints = world.edit(entityId).create(Hitpoints.class);
         world.edit(entityId).create(Collidable.class);
 
         position.current.set(x, y);
         position.previous.set(position.current);
 
         size.set(brickSize, brickSize);
-        sprite.texture = assets.getGreyBrickTexture();
+
+        // If brick has 3+ hp, start as a green brick.
+        if (startHitpoints > 2) {
+            sprite.texture = assets.getGreenBrickTexture();
+        } else if (startHitpoints > 0) {
+            switch (startHitpoints) {
+                // If brick starts with 2 hp, start as a yellow brick.
+                case 2:
+                    sprite.texture = assets.getYellowBrickTexture();
+                    break;
+                // If brick starts with 1 hp, start as a red brick.
+                case 1:
+                    sprite.texture = assets.getRedBrickTexture();
+                    break;
+            }
+        }
+        // If starting hitpoints is negative, this is an invulnerable brick.
+        else {
+            sprite.texture = assets.getGreyBrickTexture();
+        }
 
         impactSound.sound = assets.getHardBounceSound();
         impactSound.lastPlayedTime = 0f;
+
+        hitpoints.value = startHitpoints;
+
+        collisionListener.listener = (var colliderId, var brickId) -> {
+            if (hitpoints.value > 0) {
+                hitpoints.value -= 1;
+
+                // Remaining hp as a percentage, from 0f to 1f;
+                var remainingHitpoints = (float) hitpoints.value / (float) startHitpoints;
+
+                if (startHitpoints > 3) {
+                    if (remainingHitpoints > 0.6f) sprite.texture = assets.getGreenBrickTexture();
+                    else if (remainingHitpoints > 0.3f) sprite.texture = assets.getYellowBrickTexture();
+                    else sprite.texture = assets.getRedBrickTexture();
+                } else {
+                    switch (hitpoints.value) {
+                        case 3:
+                            sprite.texture = assets.getGreenBrickTexture();
+                            break;
+                        case 2:
+                            sprite.texture = assets.getGreenBrickTexture();
+                        case 1:
+                            sprite.texture = assets.getGreenBrickTexture();
+                    }
+                }
+            }
+
+            if (hitpoints.value == 0) {
+                world.delete(brickId);
+            }
+        };
     }
 }
