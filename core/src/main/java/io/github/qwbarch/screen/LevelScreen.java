@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -31,6 +33,9 @@ public final class LevelScreen implements Screen {
     private Camera camera = new OrthographicCamera();
     private FPSLogger fpsLogger = new FPSLogger();
 
+    private int spawnedBalls = 0;
+    private float accumulator = 0f;
+
     @Inject
     LevelScreen(
         World world,
@@ -53,6 +58,32 @@ public final class LevelScreen implements Screen {
         pixmap.setColor(worldBackground);
         pixmap.fill();
         background = new Texture(pixmap);
+
+        var borderThickness = 100f;
+        spawner.spawnInvisibleBorder(
+            -borderThickness,
+            -borderThickness,
+            worldWidth + borderThickness * 2,
+            borderThickness
+        );
+        spawner.spawnInvisibleBorder(
+            -borderThickness,
+            worldHeight,
+            worldWidth + borderThickness * 2,
+            borderThickness
+        );
+        spawner.spawnInvisibleBorder(
+            -borderThickness,
+            0,
+            borderThickness,
+            worldHeight
+        );
+        spawner.spawnInvisibleBorder(
+            worldWidth,
+            0,
+            borderThickness,
+            worldHeight
+        );
     }
 
     @Override
@@ -62,7 +93,6 @@ public final class LevelScreen implements Screen {
         //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        spawner.spawnBall(worldWidth / 2f, worldHeight / 2f);
         spawner.spawnPaddle();
 
         System.out.println(world.getSystems());
@@ -78,6 +108,18 @@ public final class LevelScreen implements Screen {
 
     @Override
     public void render() {
+        accumulator += Gdx.graphics.getDeltaTime();
+        if (spawnedBalls < 1 && accumulator >= 0.0001f) {
+            accumulator -= 0.0001f;
+            spawnedBalls++;
+            var reflect = MathUtils.random(1) == 0;
+            var xVel = (float) MathUtils.random(80, 160);
+            var yVel = (float) MathUtils.random(100, 160);
+            xVel = reflect ? xVel : -xVel;
+            xVel *= 0.7f;
+            yVel *= 0.7f;
+            spawner.spawnBall(worldWidth / 2f, worldHeight / 2f, xVel, yVel);
+        }
         //viewport.apply();
         //camera.update();
         batch.setProjectionMatrix(camera.combined);

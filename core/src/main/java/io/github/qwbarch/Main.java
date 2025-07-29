@@ -17,7 +17,7 @@ public class Main implements ApplicationListener {
     /**
      * Update the game's logic at a fixed 30 updates per second.
      */
-    private final static float SECONDS_PER_TICK = 1f / 15f;
+    private final static float SECONDS_PER_TICK = 1f / 60f;
 
     /**
      * World width using in-game units.

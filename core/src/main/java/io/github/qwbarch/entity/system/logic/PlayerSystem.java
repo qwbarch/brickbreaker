@@ -14,7 +14,7 @@ import javax.inject.Inject;
 @ScreenScope
 @All(Player.class)
 public final class PlayerSystem extends IteratingSystem {
-    private static final float PADDLE_VELOCITY = 120f;
+    private static final float PADDLE_VELOCITY = 500;
 
     private ComponentMapper<LinearVelocity> velocities;
 

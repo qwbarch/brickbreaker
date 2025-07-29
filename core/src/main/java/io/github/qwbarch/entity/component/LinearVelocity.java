@@ -20,11 +20,17 @@ public final class LinearVelocity extends Component {
         return this;
     }
 
-    public void reverseX() {
-        x = -x;
+    public LinearVelocity setZero() {
+        return set(0f, 0f);
     }
 
-    public void reverseY() {
+    public LinearVelocity reverseX() {
+        x = -x;
+        return this;
+    }
+
+    public LinearVelocity reverseY() {
         y = -y;
+        return this;
     }
 }
