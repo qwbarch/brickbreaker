@@ -28,6 +28,7 @@ public final class LevelScreen implements Screen {
     private final float worldWidth;
     private final float worldHeight;
     private final Texture background;
+    private final float brickSize;
 
     private Viewport viewport;
     private Camera camera = new OrthographicCamera();
@@ -44,6 +45,7 @@ public final class LevelScreen implements Screen {
         EntitySpawner spawner,
         @Named("worldWidth") float worldWidth,
         @Named("worldHeight") float worldHeight,
+        @Named("brickSize") float brickSize,
         @Named("worldBackground") Color worldBackground
     ) {
         this.world = world;
@@ -52,6 +54,7 @@ public final class LevelScreen implements Screen {
         this.spawner = spawner;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
+        this.brickSize = brickSize;
         viewport = new FitViewport(worldWidth, worldHeight, camera);
 
         var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -59,41 +62,45 @@ public final class LevelScreen implements Screen {
         pixmap.fill();
         background = new Texture(pixmap);
 
-        var borderThickness = 100f;
-        spawner.spawnInvisibleBorder(
-            -borderThickness,
-            -borderThickness,
-            worldWidth + borderThickness * 2,
-            borderThickness
-        );
-        spawner.spawnInvisibleBorder(
-            -borderThickness,
-            worldHeight,
-            worldWidth + borderThickness * 2,
-            borderThickness
-        );
-        spawner.spawnInvisibleBorder(
-            -borderThickness,
-            0,
-            borderThickness,
-            worldHeight
-        );
-        spawner.spawnInvisibleBorder(
-            worldWidth,
-            0,
-            borderThickness,
-            worldHeight
-        );
     }
 
     @Override
     public void show() {
         System.out.println("level screen");
+        var borderSize = 100f;
+        spawner.spawnInvisibleBorder(
+            -borderSize,
+            -borderSize,
+            worldWidth + borderSize * 2,
+            borderSize
+        );
+        spawner.spawnInvisibleBorder(
+            -borderSize,
+            worldHeight,
+            worldWidth + borderSize * 2,
+            borderSize
+        );
+        spawner.spawnInvisibleBorder(
+            -borderSize,
+            0,
+            borderSize,
+            worldHeight
+        );
+        spawner.spawnInvisibleBorder(
+            worldWidth,
+            0,
+            borderSize,
+            worldHeight
+        );
         //ballTexture = assets.getBallTexture();
         //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         spawner.spawnPaddle();
+
+        for (var i = 0; i < 20; i++) {
+            spawner.spawnBrick(i * brickSize, worldHeight - brickSize, 1);
+        }
 
         System.out.println(world.getSystems());
 
@@ -116,8 +123,8 @@ public final class LevelScreen implements Screen {
             var xVel = (float) MathUtils.random(80, 160);
             var yVel = (float) MathUtils.random(100, 160);
             xVel = reflect ? xVel : -xVel;
-            xVel *= 0.7f;
-            yVel *= 0.7f;
+            xVel *= .9f;
+            yVel *= .9f;
             spawner.spawnBall(worldWidth / 2f, worldHeight / 2f, xVel, yVel);
         }
         //viewport.apply();

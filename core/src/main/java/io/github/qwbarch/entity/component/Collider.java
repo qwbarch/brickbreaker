@@ -18,4 +18,10 @@ public final class Collider extends Component {
      * If false, the entity's velocity will be set to 0.
      */
     public boolean bounce;
+
+    /**
+     * If true, will player the collidable entity's impact sound.
+     * If false, will not play any sounds on impact.
+     */
+    public boolean playImpactSound;
 }

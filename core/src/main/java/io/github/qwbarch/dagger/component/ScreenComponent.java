@@ -29,7 +29,8 @@ public interface ScreenComponent {
             @BindsInstance @Named("secondsPerTick") float secondsPerTick,
             @BindsInstance @Named("worldWidth") float worldWidth,
             @BindsInstance @Named("worldHeight") float worldHeight,
-            @BindsInstance @Named("worldBackground") Color worldBackground
+            @BindsInstance @Named("worldBackground") Color worldBackground,
+            @BindsInstance @Named("brickSize") float brickSize
         );
     }
 }

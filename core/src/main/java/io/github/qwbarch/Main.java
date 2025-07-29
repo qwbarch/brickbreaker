@@ -29,6 +29,11 @@ public class Main implements ApplicationListener {
      */
     private final static float WORLD_HEIGHT = 100f;
 
+    /**
+     * The brick's width/height using in-game units.
+     */
+    private final static float BRICK_SIZE = 4f;
+
     private ScreenHandler screenHandler;
 
     @Override
@@ -43,7 +48,8 @@ public class Main implements ApplicationListener {
                         SECONDS_PER_TICK,
                         WORLD_WIDTH,
                         WORLD_HEIGHT,
-                        WORLD_BACKGROUND_COLOR
+                        WORLD_BACKGROUND_COLOR,
+                        BRICK_SIZE
                     );
         screenHandler = screenComponent.getScreenHandler();
 

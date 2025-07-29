@@ -1,6 +1,7 @@
 package io.github.qwbarch.asset;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 
@@ -10,6 +11,10 @@ import javax.inject.Inject;
 public final class AssetMap {
     private static final String BALL_TEXTURE_PATH = "ball.png";
     private static final String PADDLE_TEXTURE_PATH = "paddle.jpg";
+    private static final String GREY_BRICK_TEXTURE_PATH = "grey-brick.jpg";
+
+    private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
+    private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
 
     private final AssetManager assetManager = new AssetManager();
     private boolean finishedLoading = false;
@@ -26,6 +31,10 @@ public final class AssetMap {
         if (!finishedLoading) {
             assetManager.load(BALL_TEXTURE_PATH, Texture.class);
             assetManager.load(PADDLE_TEXTURE_PATH, Texture.class);
+            assetManager.load(GREY_BRICK_TEXTURE_PATH, Texture.class);
+
+            assetManager.load(BALL_SPAWN_SOUND_PATH, Sound.class);
+            assetManager.load(HARD_BOUNCE_SOUND_PATH, Sound.class);
         }
     }
 
@@ -59,5 +68,17 @@ public final class AssetMap {
 
     public Texture getPaddleTexture() {
        return assetManager.get(PADDLE_TEXTURE_PATH, Texture.class);
+    }
+
+    public Texture getGreyBrickTexture() {
+        return assetManager.get(GREY_BRICK_TEXTURE_PATH, Texture.class);
+    }
+
+    public Sound getBallSpawnSound() {
+       return assetManager.get(BALL_SPAWN_SOUND_PATH, Sound.class);
+    }
+
+    public Sound getHardBounceSound() {
+        return assetManager.get(HARD_BOUNCE_SOUND_PATH, Sound.class);
     }
 }

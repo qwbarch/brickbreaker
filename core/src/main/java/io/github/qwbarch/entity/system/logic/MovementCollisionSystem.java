@@ -6,6 +6,7 @@ import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
 import com.artemis.annotations.One;
 import com.artemis.utils.IntBag;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.*;
 import io.github.qwbarch.entity.system.LogicSystem;
@@ -21,7 +22,7 @@ import javax.inject.Named;
 @ScreenScope
 @All({Position.class, LinearVelocity.class, Size.class})
 @One({Collider.class})
-public final class MovementSystem extends LogicSystem {
+public final class MovementCollisionSystem extends LogicSystem {
     /**
      * Entities do multiple movement / collision detection passes
      * in order to avoid the tunneling issue (where entities
@@ -30,7 +31,7 @@ public final class MovementSystem extends LogicSystem {
      * The higher # of passes, the less likely tunneling happens.
      * However, the higher # of passes, the higher the cpu usage as well.
      */
-    private static final int PASSES = 4;
+    public static final int PASSES = 10;
     private static final float SECONDS_PER_PASS = 1f / PASSES;
 
     /**
@@ -48,13 +49,16 @@ public final class MovementSystem extends LogicSystem {
     private ComponentMapper<Size> sizes;
     private ComponentMapper<Collider> colliders;
     private ComponentMapper<Collidable> collidables;
+    private ComponentMapper<ImpactSound> impactSounds;
 
     // Allows us to iterate over collidable entities.
     private EntitySubscription collidableSubscription;
     private IntBag collidableEntities;
 
     @Inject
-    public MovementSystem(@Named("secondsPerTick") float secondsPerTick) {
+    public MovementCollisionSystem(
+        @Named("secondsPerTick") float secondsPerTick
+    ) {
         this.secondsPerTick = secondsPerTick;
     }
 
@@ -149,29 +153,53 @@ public final class MovementSystem extends LogicSystem {
                     // Collided into the left of the entity.
                     if (previousRight <= collidableLeft) {
                         position.current.x = collidableLeft - size.width;
+
                         if (collider.bounce) velocity.reverseX();
                         else velocity.setZero();
+
+                        playImpact(collidableId, collider);
                     }
                     // Collided into the right of the entity.
                     else if (previousLeft >= collidableRight) {
                         position.current.x = collidableRight;
+
                         if (collider.bounce) velocity.reverseX();
                         else velocity.setZero();
+
+                        playImpact(collidableId, collider);
                     }
                     // Collided into the bottom of the entity.
                     else if (previousTop <= collidableBottom) {
                         position.current.y = collidableBottom - size.height;
+
                         if (collider.bounce) velocity.reverseY();
                         else velocity.setZero();
+
+                        playImpact(collidableId, collider);
                     } else if (previousBottom >= collidableTop) {
                         position.current.y = collidableTop;
+
                         if (collider.bounce) velocity.reverseY();
                         else velocity.setZero();
+
+                        playImpact(collidableId, collider);
                     }
 
                     // Stop processing entities, since the object already collided into an entity.
                     return;
                 }
+            }
+        }
+    }
+
+    private void playImpact(int collidableId, Collider collider) {
+        if (collider.playImpactSound && impactSounds.has(collidableId)) {
+            var impactSound = impactSounds.get(collidableId);
+            var currentTime = System.nanoTime();
+            var timeSinceLastPlayed = (currentTime - impactSound.lastPlayedTime) / 1_000_000_000f;
+            if (impactSound.sound != null && timeSinceLastPlayed > 0.1f)  {
+                impactSound.lastPlayedTime = currentTime;
+                impactSound.sound.play();
             }
         }
     }

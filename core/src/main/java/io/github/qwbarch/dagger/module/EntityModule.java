@@ -7,7 +7,7 @@ import dagger.Provides;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.strategy.FixedTimestepInvocationStrategy;
 import io.github.qwbarch.entity.system.RenderSystem;
-import io.github.qwbarch.entity.system.logic.MovementSystem;
+import io.github.qwbarch.entity.system.logic.MovementCollisionSystem;
 import io.github.qwbarch.entity.system.logic.PlayerSystem;
 
 @Module
@@ -21,14 +21,14 @@ public final class EntityModule {
     public World provideWorld(
         FixedTimestepInvocationStrategy strategy,
         RenderSystem renderSystem,
-        MovementSystem movementSystem,
+        MovementCollisionSystem movementCollisionSystem,
         PlayerSystem playerSystem
     ) {
         System.out.println("provideWorld");
         return new World(
             new WorldConfigurationBuilder()
                 .with(playerSystem)
-                .with(movementSystem)
+                .with(movementCollisionSystem)
                 .with(renderSystem)
                 .register(strategy)
                 .build()

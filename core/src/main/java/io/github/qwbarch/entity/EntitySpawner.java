@@ -8,21 +8,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public final class EntitySpawner {
-    public static final String PADDLE_TAG = "PADDLE";
-
     private final World world;
     private final AssetMap assets;
     private final float worldWidth;
+    private final float brickSize;
 
     @Inject
     EntitySpawner(
         World world,
         AssetMap assets,
-        @Named("worldWidth") float worldWidth
+        @Named("worldWidth") float worldWidth,
+        @Named("brickSize") float brickSize
     ) {
         this.world = world;
         this.assets = assets;
         this.worldWidth = worldWidth;
+        this.brickSize = brickSize;
     }
 
     public void spawnBall(float x, float y, float xVel, float yVel) {
@@ -41,7 +42,9 @@ public final class EntitySpawner {
         velocity.y = yVel;
 
         sprite.texture = assets.getBallTexture();
+
         collider.bounce = true;
+        collider.playImpactSound = true;
     }
 
     public void spawnPaddle() {
@@ -50,6 +53,7 @@ public final class EntitySpawner {
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
         var collider = world.edit(entityId).create(Collider.class);
+        var impactSound = world.edit(entityId).create(ImpactSound.class);
         world.edit(entityId).create(Collidable.class);
         world.edit(entityId).create(LinearVelocity.class);
         world.edit(entityId).create(Player.class);
@@ -62,16 +66,42 @@ public final class EntitySpawner {
         sprite.texture = assets.getPaddleTexture();
 
         collider.bounce = false;
+        collider.playImpactSound = false;
+
+        impactSound.sound = assets.getHardBounceSound();
+        impactSound.lastPlayedTime = 0f;
     }
 
     public void spawnInvisibleBorder(float x, float y, float width, float height) {
-         var entityId = world.create();
-         var position = world.edit(entityId).create(Position.class);
-         var size = world.edit(entityId).create(Size.class);
-         world.edit(entityId).create(Collidable.class);
+        var entityId = world.create();
+        var position = world.edit(entityId).create(Position.class);
+        var size = world.edit(entityId).create(Size.class);
+        var impactSound = world.edit(entityId).create(ImpactSound.class);
+        world.edit(entityId).create(Collidable.class);
 
-         position.current.set(x, y);
-         position.previous.set(position.current);
-         size.set(width, height);
+        position.current.set(x, y);
+        position.previous.set(position.current);
+        size.set(width, height);
+
+        impactSound.sound = assets.getHardBounceSound();
+        impactSound.lastPlayedTime = 0f;
+    }
+
+    public void spawnBrick(float x, float y, int hitpoints) {
+        var entityId = world.create();
+        var position = world.edit(entityId).create(Position.class);
+        var size = world.edit(entityId).create(Size.class);
+        var sprite = world.edit(entityId).create(Sprite.class);
+        var impactSound = world.edit(entityId).create(ImpactSound.class);
+        world.edit(entityId).create(Collidable.class);
+
+        position.current.set(x, y);
+        position.previous.set(position.current);
+
+        size.set(brickSize, brickSize);
+        sprite.texture = assets.getGreyBrickTexture();
+
+        impactSound.sound = assets.getHardBounceSound();
+        impactSound.lastPlayedTime = 0f;
     }
 }
