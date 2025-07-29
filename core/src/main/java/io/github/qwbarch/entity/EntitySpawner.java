@@ -6,27 +6,27 @@ import io.github.qwbarch.entity.component.LinearVelocity;
 import io.github.qwbarch.entity.component.Position;
 import io.github.qwbarch.entity.component.Size;
 import io.github.qwbarch.entity.component.Sprite;
+import io.github.qwbarch.entity.component.flag.IsPlayer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 public final class EntitySpawner {
+    public static final String PADDLE_TAG = "PADDLE";
+
     private final World world;
     private final AssetMap assets;
     private final float worldWidth;
-    private final float worldHeight;
 
     @Inject
     EntitySpawner(
         World world,
         AssetMap assets,
-        @Named("worldWidth") float worldWidth,
-        @Named("worldHeight") float worldHeight
+        @Named("worldWidth") float worldWidth
     ) {
         this.world = world;
         this.assets = assets;
         this.worldWidth = worldWidth;
-        this.worldHeight = worldHeight;
     }
 
     public int spawnBall(float x, float y) {
@@ -56,13 +56,14 @@ public final class EntitySpawner {
         var position = world.edit(entityId).create(Position.class);
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
+        world.edit(entityId).create(LinearVelocity.class);
+        world.edit(entityId).create(IsPlayer.class);
 
         position.current.x = worldWidth / 2f;
         position.current.y = 10f;
         position.previous.set(position.current);
 
         size.set(12.1f, 2.42f);
-
         sprite.texture = assets.getPaddleTexture();
 
         return entityId;

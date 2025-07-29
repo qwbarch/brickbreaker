@@ -9,6 +9,7 @@ import io.github.qwbarch.entity.strategy.FixedTimestepInvocationStrategy;
 import io.github.qwbarch.entity.system.RenderSystem;
 import io.github.qwbarch.entity.system.logic.CollisionSystem;
 import io.github.qwbarch.entity.system.logic.MovementSystem;
+import io.github.qwbarch.entity.system.logic.PlayerSystem;
 
 @Module
 public final class EntityModule {
@@ -25,11 +26,13 @@ public final class EntityModule {
         FixedTimestepInvocationStrategy strategy,
         MovementSystem movementSystem,
         RenderSystem renderSystem,
-        CollisionSystem collisionSystem
+        CollisionSystem collisionSystem,
+        PlayerSystem playerSystem
     ) {
         System.out.println("provideWorld");
         return new World(
             new WorldConfigurationBuilder()
+                .with(playerSystem)
                 .with(movementSystem)
                 .with(collisionSystem)
                 .with(renderSystem)

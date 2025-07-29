@@ -25,6 +25,7 @@ public final class LevelScreen implements Screen {
     private final EntitySpawner spawner;
     private final float worldWidth;
     private final float worldHeight;
+    private final Texture background;
 
     private Viewport viewport;
     private Camera camera = new OrthographicCamera();
@@ -37,7 +38,8 @@ public final class LevelScreen implements Screen {
         SpriteBatch batch,
         EntitySpawner spawner,
         @Named("worldWidth") float worldWidth,
-        @Named("worldHeight") float worldHeight
+        @Named("worldHeight") float worldHeight,
+        @Named("worldBackground") Color worldBackground
     ) {
         this.world = world;
         this.assets = assets;
@@ -46,9 +48,11 @@ public final class LevelScreen implements Screen {
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
         viewport = new FitViewport(worldWidth, worldHeight, camera);
-        //var entityId = world.create();
-        // var position = world.edit(entityId).create(Position.class);
-        // var velocity = world.edit(entityId).create(LinearVelocity.class);
+
+        var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(worldBackground);
+        pixmap.fill();
+        background = new Texture(pixmap);
     }
 
     @Override
@@ -78,6 +82,8 @@ public final class LevelScreen implements Screen {
         //camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
+        batch.draw(background, 0, 0, worldWidth, worldHeight);
 
         // batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
         world.process();

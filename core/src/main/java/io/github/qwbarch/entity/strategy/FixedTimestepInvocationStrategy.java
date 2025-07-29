@@ -9,6 +9,8 @@ import io.github.qwbarch.entity.system.RenderSystem;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+// TODO: USE ArrayMap INSTEAD.
+
 /**
  * Implements a fixed timestep game loop.
  * <a href="https://gafferongames.com/post/fix_your_timestep/">Fix your timestep by Gaffer On Games</a>

@@ -2,14 +2,16 @@ package io.github.qwbarch;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.qwbarch.dagger.component.DaggerClientComponent;
 import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
 public class Main implements ApplicationListener {
-    public static final Color DEFAULT_BACKGROUND_COLOR =
+    private static final Color MAIN_BACKGROUND_COLOR =
+        Color.valueOf("#3b3b3b"); // Gray color.
+
+    private static final Color WORLD_BACKGROUND_COLOR =
         Color.valueOf("#525252"); // Gray color.
 
     /**
@@ -20,7 +22,7 @@ public class Main implements ApplicationListener {
     /**
      * World width using in-game units.
      */
-    private final static float WORLD_WIDTH = 100f;
+    private final static float WORLD_WIDTH = 120f;
 
     /**
      * World height using in-game units.
@@ -40,7 +42,8 @@ public class Main implements ApplicationListener {
                         clientComponent,
                         SECONDS_PER_TICK,
                         WORLD_WIDTH,
-                        WORLD_HEIGHT
+                        WORLD_HEIGHT,
+                        WORLD_BACKGROUND_COLOR
                     );
         screenHandler = screenComponent.getScreenHandler();
 
@@ -60,7 +63,7 @@ public class Main implements ApplicationListener {
         // batch.draw(image, 140, 210);
         // batch.end();
 
-        ScreenUtils.clear(DEFAULT_BACKGROUND_COLOR);
+        ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }
 

@@ -1,5 +1,6 @@
 package io.github.qwbarch.dagger.component;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.BindsInstance;
 import dagger.Component;
@@ -27,7 +28,8 @@ public interface ScreenComponent {
             ClientComponent clientComponent,
             @BindsInstance @Named("secondsPerTick") float secondsPerTick,
             @BindsInstance @Named("worldWidth") float worldWidth,
-            @BindsInstance @Named("worldHeight") float worldHeight
+            @BindsInstance @Named("worldHeight") float worldHeight,
+            @BindsInstance @Named("worldBackground") Color worldBackground
         );
     }
 }
