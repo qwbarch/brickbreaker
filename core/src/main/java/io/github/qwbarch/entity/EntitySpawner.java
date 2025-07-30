@@ -133,6 +133,7 @@ public final class EntitySpawner {
                 // Launch the ball.
                 if (keycode == Input.Keys.SPACE) {
                     launchBall(velocity);
+                    assets.getBallSpawnSound().play();
 
                     // Request the input listener to be removed.
                     inputListener.unregister = true;
@@ -186,7 +187,7 @@ public final class EntitySpawner {
         collider.bounce = false;
         collider.playImpactSound = false;
 
-        impactSound.sound = assets.getHardBounceSound();
+        impactSound.sound = assets.getSoftBounceSound();
         impactSound.lastPlayedTime = 0f;
 
         // Move the paddle left and right using the arrow keys.
@@ -227,7 +228,7 @@ public final class EntitySpawner {
         position.previous.set(position.current);
         size.set(width, height);
 
-        impactSound.sound = assets.getHardBounceSound();
+        impactSound.sound = assets.getSoftBounceSound();
         impactSound.lastPlayedTime = 0f;
     }
 
@@ -261,7 +262,7 @@ public final class EntitySpawner {
             sprite.texture = assets.getGreyBrickTexture();
         }
 
-        impactSound.sound = assets.getHardBounceSound();
+        impactSound.sound = assets.getSoftBounceSound();
         impactSound.lastPlayedTime = 0f;
 
         hitpoints.value = startHitpoints;

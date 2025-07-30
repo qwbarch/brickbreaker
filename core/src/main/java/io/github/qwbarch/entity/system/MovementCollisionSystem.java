@@ -27,7 +27,7 @@ public final class MovementCollisionSystem extends LogicSystem {
      * The higher # of passes, the less likely tunneling happens.
      * However, the higher # of passes, the higher the cpu usage as well.
      */
-    public static final int PASSES = 10;
+    public static final int PASSES = 20;
     private static final float SECONDS_PER_PASS = 1f / PASSES;
 
     /**

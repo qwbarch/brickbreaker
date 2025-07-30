@@ -69,7 +69,7 @@ public class Main implements ApplicationListener {
     /**
      * The speed of the paddle using in-game units.
      */
-    private final static float PADDLE_VELOCITY = 120f;
+    private final static float PADDLE_VELOCITY = 160f;
 
     /**
      * The ball's spawning x-coordinate using in-game units.
