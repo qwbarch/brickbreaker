@@ -3,6 +3,7 @@ package io.github.qwbarch.asset;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -85,6 +86,8 @@ public final class AssetMap {
         var params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
         params.fontFileName = MAIN_FONT_PATH;
         params.fontParameters.size = logoFontSize;
+        params.fontParameters.borderWidth = 5f;
+        params.fontParameters.borderColor = Color.BLACK;
         assetManager.load(MAIN_FONT_PATH, BitmapFont.class, params);
         assetManager.finishLoadingAsset(MAIN_FONT_PATH);
         return getMainFont();
