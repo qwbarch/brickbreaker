@@ -6,6 +6,7 @@ import dagger.Binds;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.Subcomponent;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.module.EntityModule;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.screen.LoadingScreen;
@@ -22,6 +23,8 @@ public interface ScreenComponent {
     ScreenHandler getScreenHandler();
 
     LoadingScreen getLoadingScreen();
+
+    AssetMap getAssets();
 
     @Component.Factory
     interface Factory {

@@ -3,6 +3,7 @@ package io.github.qwbarch;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.component.DaggerClientComponent;
 import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
@@ -106,6 +107,7 @@ public class Main implements ApplicationListener {
     private static final String LOGO = LEFT_LOGO + " " + RIGHT_LOGO;
 
     private ScreenHandler screenHandler;
+    private AssetMap assets;
 
     @Override
     public void create() {
@@ -136,6 +138,7 @@ public class Main implements ApplicationListener {
                         LOGO
                     );
         screenHandler = screenComponent.getScreenHandler();
+        assets = screenComponent.getAssets();
 
         // Start the loading screen.
         screenHandler.setScreen(screenComponent.getLoadingScreen());
@@ -170,9 +173,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void dispose() {
-        // batch.dispose();
-        // image.dispose();
-
         screenHandler.getCurrentScreen().dispose();
+        assets.dispose();
     }
 }

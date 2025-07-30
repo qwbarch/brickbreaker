@@ -1,5 +1,6 @@
 package io.github.qwbarch.asset;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
@@ -9,13 +10,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Disposable;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 @ScreenScope
-public final class AssetMap {
+public final class AssetMap implements Disposable {
     private static final String BALL_TEXTURE_PATH = "ball.png";
     private static final String PADDLE_TEXTURE_PATH = "paddle.jpg";
 
@@ -33,6 +36,8 @@ public final class AssetMap {
     private static final String BUTTON_CLICK_SOUND_PATH = "button-click.mp3";
 
     private static final String MAIN_FONT_PATH = "Blanka-Regular.otf";
+
+    private static final String SKIN_PATH = "comic-ui/comic-ui.json";
 
     private final AssetManager assetManager = new AssetManager();
     private final int logoFontSize;
@@ -69,6 +74,8 @@ public final class AssetMap {
             assetManager.load(HARD_BOUNCE_SOUND_PATH, Sound.class);
             assetManager.load(BUTTON_HOVER_SOUND_PATH, Sound.class);
             assetManager.load(BUTTON_CLICK_SOUND_PATH, Sound.class);
+
+            assetManager.load(SKIN_PATH, Skin.class);
         }
     }
 
@@ -111,7 +118,7 @@ public final class AssetMap {
     }
 
     public Texture getPaddleTexture() {
-       return assetManager.get(PADDLE_TEXTURE_PATH, Texture.class);
+        return assetManager.get(PADDLE_TEXTURE_PATH, Texture.class);
     }
 
     public Texture getGreyBrickTexture() {
@@ -135,7 +142,7 @@ public final class AssetMap {
     }
 
     public Sound getBallSpawnSound() {
-       return assetManager.get(BALL_SPAWN_SOUND_PATH, Sound.class);
+        return assetManager.get(BALL_SPAWN_SOUND_PATH, Sound.class);
     }
 
     public Sound getHardBounceSound() {
@@ -148,5 +155,14 @@ public final class AssetMap {
 
     public Sound getButtonClickSound() {
         return assetManager.get(BUTTON_CLICK_SOUND_PATH, Sound.class);
+    }
+
+    public Skin getSkin() {
+        return assetManager.get(SKIN_PATH, Skin.class);
+    }
+
+    @Override
+    public void dispose() {
+        assetManager.dispose();
     }
 }

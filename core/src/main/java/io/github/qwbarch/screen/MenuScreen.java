@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.MenuButton;
@@ -18,7 +17,6 @@ import javax.inject.Named;
 
 public final class MenuScreen implements Screen {
     private final Stage stage = new Stage(new ScreenViewport());
-    private Skin skin;
 
     private final ScreenHandler screenHandler;
     private final Screen instructionScreen;
@@ -34,8 +32,6 @@ public final class MenuScreen implements Screen {
     private float rightLogoWidth;
     private float logoWidth;
     private float logoHeight;
-
-    private float elapsedTime;
 
     // Only play the BGM the first time the menu screen is shown.
     private boolean firstRun = true;
@@ -67,7 +63,7 @@ public final class MenuScreen implements Screen {
         var screenHeight = Gdx.graphics.getHeight();
         var hoverSound = assets.getButtonHoverSound();
 
-        var selectLevelButton = new MenuButton("Select Level", skin, assets);
+        var selectLevelButton = new MenuButton("Select Level", assets);
         selectLevelButton.setPosition(
             screenWidth/ 2f - selectLevelButton.getWidth() / 2f,
             screenHeight - logoHeight * 7f
@@ -78,7 +74,7 @@ public final class MenuScreen implements Screen {
             }
         });
 
-        var howToPlayButton = new MenuButton("How To Play", skin, assets);
+        var howToPlayButton = new MenuButton("How To Play", assets);
         howToPlayButton.setPosition(
             screenWidth/ 2f - howToPlayButton.getWidth() / 2f,
             screenHeight - logoHeight * 8f
@@ -90,7 +86,7 @@ public final class MenuScreen implements Screen {
             }
         });
 
-        var quitButton = new MenuButton("Quit Game", skin, assets);
+        var quitButton = new MenuButton("Quit Game", assets);
         quitButton.setPosition(
             screenWidth/ 2f - quitButton.getWidth() / 2f,
             screenHeight - logoHeight * 9f
@@ -112,7 +108,6 @@ public final class MenuScreen implements Screen {
     @Override
     public void show() {
         font = assets.getMainFont();
-        skin = new Skin(Gdx.files.internal("comic-ui/comic-ui.json"));
 
         // Calculate dimensions of the right side of the logo.
         glyphLayout.setText(font, rightLogo);
@@ -138,7 +133,6 @@ public final class MenuScreen implements Screen {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
 
-        elapsedTime += Gdx.graphics.getDeltaTime();
         batch.begin();
 
         // Draw the left logo.
@@ -165,6 +159,5 @@ public final class MenuScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
     }
 }
