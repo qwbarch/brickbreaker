@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.scope.ScreenScope;
+import io.github.qwbarch.screen.level.Level1Screen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,6 +20,7 @@ import javax.inject.Named;
 @ScreenScope
 public final class MenuScreen implements Screen {
     private final ScreenHandler screenHandler;
+    private final Screen level1Screen;
     private final Screen instructionScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
@@ -39,6 +42,7 @@ public final class MenuScreen implements Screen {
     @Inject
     MenuScreen(
         ScreenHandler screenHandler,
+        Level1Screen level1Screen,
         InstructionScreen instructionScreen,
         AssetMap assets,
         SpriteBatch batch,
@@ -49,6 +53,7 @@ public final class MenuScreen implements Screen {
     ) {
         System.out.println("MenuScreen constructor");
         this.screenHandler = screenHandler;
+        this.level1Screen = level1Screen;
         this.instructionScreen = instructionScreen;
         this.assets = assets;
         this.batch = batch;
@@ -66,11 +71,17 @@ public final class MenuScreen implements Screen {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
 
+        var group = new VerticalGroup();
+
+        var playButton = new MenuButton("Play Game", assets);
+        playButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                screenHandler.setScreen(level1Screen);
+            }
+        });
+
         var selectLevelButton = new MenuButton("Select Level", assets);
-        selectLevelButton.setPosition(
-            screenWidth/ 2f - selectLevelButton.getWidth() / 2f,
-            screenHeight - logoHeight * 7f
-        );
         selectLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -78,10 +89,6 @@ public final class MenuScreen implements Screen {
         });
 
         var howToPlayButton = new MenuButton("How To Play", assets);
-        howToPlayButton.setPosition(
-            screenWidth/ 2f - howToPlayButton.getWidth() / 2f,
-            screenHeight - logoHeight * 8f
-        );
         howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -90,10 +97,6 @@ public final class MenuScreen implements Screen {
         });
 
         var quitButton = new MenuButton("Quit Game", assets);
-        quitButton.setPosition(
-            screenWidth/ 2f - quitButton.getWidth() / 2f,
-            screenHeight - logoHeight * 9f
-        );
         quitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -101,9 +104,18 @@ public final class MenuScreen implements Screen {
             }
         });
 
-        stage.addActor(selectLevelButton);
-        stage.addActor(howToPlayButton);
-        stage.addActor(quitButton);
+        group.addActor(playButton);
+        group.addActor(selectLevelButton);
+        group.addActor(howToPlayButton);
+        group.addActor(quitButton);
+
+        group.space(20f);
+        group.setPosition(
+            screenWidth / 2f - group.getWidth() / 2f,
+            screenHeight - logoHeight * 6.5f
+        );
+
+        stage.addActor(group);
     }
 
     @Override

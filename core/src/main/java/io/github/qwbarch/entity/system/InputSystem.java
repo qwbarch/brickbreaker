@@ -19,6 +19,9 @@ public final class InputSystem extends IteratingSystem {
      */
     private final InputMultiplexer multiplexer = new InputMultiplexer();
 
+    // TODO: THIS IS A WORKAROUND FOR A BUG, MAKE MULTIPLEXER NOT LOCAL TO HERE.
+    private boolean firstRun = true;
+
     private ComponentMapper<InputListener> inputListeners;
 
     @Inject
@@ -26,7 +29,6 @@ public final class InputSystem extends IteratingSystem {
 
     @Override
     protected void initialize() {
-        Gdx.input.setInputProcessor(multiplexer);
         world.getAspectSubscriptionManager().get(Aspect.all(InputListener.class)).addSubscriptionListener(new EntitySubscription.SubscriptionListener() {
             @Override
             public void inserted(IntBag entities) {
@@ -43,6 +45,14 @@ public final class InputSystem extends IteratingSystem {
             public void removed(IntBag intBag) {
             }
         });
+    }
+
+    @Override
+    protected void begin() {
+        if (firstRun) {
+            firstRun = false;
+            Gdx.input.setInputProcessor(multiplexer);
+        }
     }
 
     @Override

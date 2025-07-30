@@ -209,10 +209,12 @@ public final class MovementCollisionSystem extends LogicSystem {
 
         // Run the collision listener function.
         if (collisionListeners.has(colliderId)) {
-            collisionListeners.get(colliderId).listener.collide(colliderId, collidableId);
+            var listener = collisionListeners.get(colliderId).listener;
+            if (listener != null) listener.collide(colliderId, collidableId);
         }
         if (collisionListeners.has(collidableId)) {
-            collisionListeners.get(collidableId).listener.collide(colliderId, collidableId);
+            var listener = collisionListeners.get(collidableId).listener;
+            if (listener != null) listener.collide(colliderId, collidableId);
         }
     }
 }

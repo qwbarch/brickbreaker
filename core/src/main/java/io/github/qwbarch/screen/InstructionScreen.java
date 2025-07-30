@@ -67,6 +67,7 @@ public final class InstructionScreen implements Screen {
                 5. Bricks have a chance to spawn new balls when hit.
                 ----------------------------------------------------------------
                 Brick health:
+                Grey - Indestructible. These don't count towards the objective.
                 Green - High health
                 Yellow - Medium health
                 Red - Low health

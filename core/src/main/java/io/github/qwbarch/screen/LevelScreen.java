@@ -20,54 +20,43 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @ScreenScope
-public final class LevelScreen implements Screen {
+public abstract class LevelScreen implements Screen {
     private final World world;
-    private final AssetMap assets;
     private final SpriteBatch batch;
     private final EntitySpawner spawner;
     private final float worldWidth;
     private final float worldHeight;
     private final Texture background;
-    private final float brickSize;
 
     private Viewport viewport;
     private Camera camera = new OrthographicCamera();
     private FPSLogger fpsLogger = new FPSLogger();
 
-    private int spawnedBalls = 0;
-    private float accumulator = 0f;
-
-    @Inject
-    LevelScreen(
+    protected LevelScreen(
         World world,
-        AssetMap assets,
         SpriteBatch batch,
         EntitySpawner spawner,
-        @Named("worldWidth") float worldWidth,
-        @Named("worldHeight") float worldHeight,
-        @Named("brickSize") float brickSize,
-        @Named("worldBackground") Color worldBackground
+        float worldWidth,
+        float worldHeight,
+        Color worldBackground
     ) {
         System.out.println("LevelScreen constructor");
         this.world = world;
-        this.assets = assets;
         this.batch = batch;
         this.spawner = spawner;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-        this.brickSize = brickSize;
         viewport = new FitViewport(worldWidth, worldHeight, camera);
 
         var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(worldBackground);
         pixmap.fill();
         background = new Texture(pixmap);
-
     }
 
     @Override
     public void show() {
-        System.out.println("level screen");
+        System.out.println("level screen show");
         var borderSize = 100f;
         spawner.spawnInvisibleBorder(
             -borderSize,
@@ -93,22 +82,13 @@ public final class LevelScreen implements Screen {
             borderSize,
             worldHeight
         );
-        //ballTexture = assets.getBallTexture();
-        //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-
         var paddleId = spawner.spawnPaddle();
 
-        for (var i = 0; i < 20; i++) {
-            spawner.spawnBrick(i * brickSize, worldHeight - brickSize, 1);
-        }
 
         spawner.spawnStartingBall(paddleId);
 
-        System.out.println(world.getSystems());
-
-        //camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0f);
-        //camera.update();
+        // Center the camera.
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     @Override

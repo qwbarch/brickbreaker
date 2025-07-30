@@ -17,7 +17,6 @@ public final class LoadingScreen implements Screen {
     private final SpriteBatch batch;
     private final ScreenHandler screenHandler;
     private final Screen menuScreen;
-    private final Screen levelScreen;
     private final AssetMap assets;
     private final BitmapFont font;
     private final String leftLogo;
@@ -35,7 +34,6 @@ public final class LoadingScreen implements Screen {
         ScreenHandler screenHandler,
         GlyphLayout glyphLayout,
         MenuScreen menuScreen,
-        LevelScreen levelScreen,
         AssetMap assets,
         World world,
         SpriteBatch batch,
@@ -46,7 +44,6 @@ public final class LoadingScreen implements Screen {
         this.batch = batch;
         this.screenHandler = screenHandler;
         this.menuScreen = menuScreen;
-        this.levelScreen = levelScreen;
         this.assets = assets;
         this.leftLogo = leftLogo;
         this.rightLogo = rightLogo;
@@ -67,6 +64,11 @@ public final class LoadingScreen implements Screen {
         glyphLayout.setText(font, logo);
         logoWidth = glyphLayout.width;
         logoHeight = glyphLayout.height;
+    }
+
+    @Override
+    public void hide() {
+        screenHandler.remove(this);
     }
 
     @Override

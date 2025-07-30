@@ -33,11 +33,9 @@ public class ScreenHandler implements Disposable {
      * Adds a reference to the screen.
      *
      * @param screen The screen to add to the screen handler.
-     * @return Reference to this screen handler to allow chaining method calls.
      */
-    public ScreenHandler add(Screen screen) {
+    public void add(Screen screen) {
         screens.add(screen);
-        return this;
     }
 
     /**
