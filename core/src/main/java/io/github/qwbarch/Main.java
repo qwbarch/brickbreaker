@@ -87,11 +87,6 @@ public class Main implements ApplicationListener {
     private final static float BALL_VELOCITY = 120f;
 
     /**
-     * The font size for the loading screen's logo.
-     */
-    private final static int LOGO_FONT_SIZE = 80;
-
-    /**
      * The left part of the logo.
      */
     private static final String LEFT_LOGO = "Brick";
@@ -132,7 +127,6 @@ public class Main implements ApplicationListener {
                         PADDLE_VELOCITY,
                         PADDLE_SPAWN_X,
                         PADDLE_SPAWN_Y,
-                        LOGO_FONT_SIZE,
                         LEFT_LOGO,
                         RIGHT_LOGO,
                         LOGO

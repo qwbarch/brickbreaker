@@ -44,7 +44,6 @@ public interface ScreenComponent {
             @BindsInstance @Named("paddleVelocity") float paddleVelocity,
             @BindsInstance @Named("paddleSpawnX") float paddleSpawnX,
             @BindsInstance @Named("paddleSpawnY") float paddleSpawnY,
-            @BindsInstance @Named("logoFontSize") int logoFontSize,
             @BindsInstance @Named("leftLogo") String leftLogo,
             @BindsInstance @Named("rightLogo") String rightLogo,
             @BindsInstance @Named("logo") String logo

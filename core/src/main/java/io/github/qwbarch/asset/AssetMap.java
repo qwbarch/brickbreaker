@@ -1,6 +1,5 @@
 package io.github.qwbarch.asset;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
@@ -35,19 +34,17 @@ public final class AssetMap implements Disposable {
     private static final String BUTTON_HOVER_SOUND_PATH = "button-hover.mp3";
     private static final String BUTTON_CLICK_SOUND_PATH = "button-click.mp3";
 
-    private static final String MAIN_FONT_PATH = "Blanka-Regular.otf";
+    private static final String HEADER_FONT_PATH = "Blanka-Regular.otf";
+    private static final String BODY_FONT_PATH = "sf-atarian-system.regular.ttf";
 
     private static final String SKIN_PATH = "comic-ui/comic-ui.json";
 
     private final AssetManager assetManager = new AssetManager();
-    private final int logoFontSize;
     private boolean finishedLoading = false;
 
     @Inject
-    AssetMap(@Named("logoFontSize") int logoFontSize) {
+    AssetMap() {
         System.out.println("AssetMap constructor");
-
-        this.logoFontSize = logoFontSize;
 
         // Enable AssetManager to load fonts.
         var resolver = new InternalFileHandleResolver();
@@ -76,6 +73,15 @@ public final class AssetMap implements Disposable {
             assetManager.load(BUTTON_CLICK_SOUND_PATH, Sound.class);
 
             assetManager.load(SKIN_PATH, Skin.class);
+
+            // Load the body font.
+            var params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+            params.fontFileName = BODY_FONT_PATH;
+            params.fontParameters.size = 48;
+            params.fontParameters.color = Color.WHITE;
+            params.fontParameters.borderColor = Color.BLACK;
+            params.fontParameters.borderWidth = 2f;
+            assetManager.load(BODY_FONT_PATH, BitmapFont.class, params);
         }
     }
 
@@ -96,17 +102,21 @@ public final class AssetMap implements Disposable {
      */
     public BitmapFont loadMainFont() {
         var params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        params.fontFileName = MAIN_FONT_PATH;
-        params.fontParameters.size = logoFontSize;
+        params.fontFileName = HEADER_FONT_PATH;
+        params.fontParameters.size = 80;
         params.fontParameters.borderWidth = 5f;
         params.fontParameters.borderColor = Color.BLACK;
-        assetManager.load(MAIN_FONT_PATH, BitmapFont.class, params);
-        assetManager.finishLoadingAsset(MAIN_FONT_PATH);
-        return getMainFont();
+        assetManager.load(HEADER_FONT_PATH, BitmapFont.class, params);
+        assetManager.finishLoadingAsset(HEADER_FONT_PATH);
+        return getHeaderFont();
     }
 
-    public BitmapFont getMainFont() {
-        return assetManager.get(MAIN_FONT_PATH, BitmapFont.class);
+    public BitmapFont getHeaderFont() {
+        return assetManager.get(HEADER_FONT_PATH, BitmapFont.class);
+    }
+
+    public BitmapFont getBodyFont() {
+        return assetManager.get(BODY_FONT_PATH, BitmapFont.class);
     }
 
     public boolean isFinishedLoading() {

@@ -39,7 +39,6 @@ public final class LoadingScreen implements Screen {
         AssetMap assets,
         World world,
         SpriteBatch batch,
-        @Named("logoFontSize") int logoFontSize,
         @Named("leftLogo") String leftLogo,
         @Named("rightLogo") String rightLogo,
         @Named("logo") String logo

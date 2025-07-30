@@ -10,18 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
+import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+@ScreenScope
 public final class MenuScreen implements Screen {
-    private final Stage stage = new Stage(new ScreenViewport());
-
     private final ScreenHandler screenHandler;
     private final Screen instructionScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final GlyphLayout glyphLayout;
+    private final Stage stage;
 
     private final String leftLogo;
     private final String rightLogo;
@@ -55,6 +56,7 @@ public final class MenuScreen implements Screen {
         this.leftLogo = leftLogo;
         this.rightLogo = rightLogo;
         this.logo = logo;
+        stage = new Stage(new ScreenViewport(), batch);
     }
 
     private void setupStage() {
@@ -106,7 +108,7 @@ public final class MenuScreen implements Screen {
 
     @Override
     public void show() {
-        font = assets.getMainFont();
+        font = assets.getHeaderFont();
 
         // Calculate dimensions of the right side of the logo.
         glyphLayout.setText(font, rightLogo);
@@ -160,7 +162,6 @@ public final class MenuScreen implements Screen {
             leftLogoX + logoWidth - rightLogoWidth,
             logoY
         );
-
         batch.end();
 
         stage.act(Gdx.graphics.getDeltaTime());
