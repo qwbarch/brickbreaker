@@ -6,9 +6,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.strategy.FixedTimestepInvocationStrategy;
-import io.github.qwbarch.entity.system.RenderSystem;
-import io.github.qwbarch.entity.system.InputSystem;
-import io.github.qwbarch.entity.system.MovementCollisionSystem;
+import io.github.qwbarch.entity.system.*;
 
 @Module
 public final class EntityModule {
@@ -22,13 +20,17 @@ public final class EntityModule {
         FixedTimestepInvocationStrategy strategy,
         RenderSystem renderSystem,
         MovementCollisionSystem movementCollisionSystem,
-        InputSystem inputSystem
+        InputSystem inputSystem,
+        DespawnSystem despawnSystem,
+        PlayerHealthSystem playerHealthSystem
     ) {
         System.out.println("provideWorld");
         return new World(
             new WorldConfigurationBuilder()
                 .with(inputSystem)
                 .with(movementCollisionSystem)
+                .with(despawnSystem)
+                .with(playerHealthSystem)
                 .with(renderSystem)
                 .register(strategy)
                 .build()

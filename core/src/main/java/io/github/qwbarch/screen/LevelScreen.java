@@ -60,12 +60,6 @@ public abstract class LevelScreen implements Screen {
         var borderSize = 100f;
         spawner.spawnInvisibleBorder(
             -borderSize,
-            -borderSize,
-            worldWidth + borderSize * 2,
-            borderSize
-        );
-        spawner.spawnInvisibleBorder(
-            -borderSize,
             worldHeight,
             worldWidth + borderSize * 2,
             borderSize

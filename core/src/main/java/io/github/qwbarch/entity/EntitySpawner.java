@@ -88,6 +88,8 @@ public final class EntitySpawner {
         var sprite = world.edit(entityId).create(Sprite.class);
         var collider = world.edit(entityId).create(Collider.class);
         var collisionListener = world.edit(entityId).create(CollisionListener.class);
+        world.edit(entityId).create(Despawnable.class);
+        world.edit(entityId).create(PlayerHealth.class);
 
         position.current.set(x, y);
         position.previous.set(position.current);
@@ -123,6 +125,8 @@ public final class EntitySpawner {
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
         var inputListener = world.edit(entityId).create(InputListener.class);
+        world.edit(entityId).create(Despawnable.class);
+        world.edit(entityId).create(PlayerHealth.class);
 
         position.current.x = startingBallSpawnX;
         position.current.y = startingBallSpawnY;
