@@ -1,11 +1,17 @@
 package io.github.qwbarch.asset;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @ScreenScope
 public final class AssetMap {
@@ -22,16 +28,27 @@ public final class AssetMap {
     private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
     private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
 
+    private static final String LOGO_FONT_PATH = "Blanka-Regular.otf";
+
     private final AssetManager assetManager = new AssetManager();
+    private final int logoFontSize;
     private boolean finishedLoading = false;
 
     @Inject
-    AssetMap() {
+    AssetMap(@Named("logoFontSize") int logoFontSize) {
         System.out.println("AssetMap constructor");
+
+        this.logoFontSize = logoFontSize;
+
+        // Enable AssetManager to load fonts.
+        var resolver = new InternalFileHandleResolver();
+        assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
+        assetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));
+        assetManager.setLoader(BitmapFont.class, ".otf", new FreetypeFontLoader(resolver));
     }
 
     /**
-     * Begin loading all the game's assets.
+     * Begin loading all the game's assets asynchronously.
      */
     public void loadAssets() {
         if (!finishedLoading) {
@@ -59,6 +76,18 @@ public final class AssetMap {
             // https://libgdx.com/wiki/managing-your-assets#optimize-loading
             finishedLoading = assetManager.update(17);
         }
+    }
+
+    /**
+     * Load the font used for the logo. This blocks the thread and waits for the file to load.
+     */
+    public BitmapFont loadLogoFont() {
+        var params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+        params.fontFileName = LOGO_FONT_PATH;
+        params.fontParameters.size = logoFontSize;
+        assetManager.load(LOGO_FONT_PATH, BitmapFont.class, params);
+        assetManager.finishLoadingAsset(LOGO_FONT_PATH);
+        return assetManager.get(LOGO_FONT_PATH, BitmapFont.class);
     }
 
     /**

@@ -39,7 +39,8 @@ public interface ScreenComponent {
             @BindsInstance @Named("paddleHeight") float paddleHeight,
             @BindsInstance @Named("paddleVelocity") float paddleVelocity,
             @BindsInstance @Named("paddleSpawnX") float paddleSpawnX,
-            @BindsInstance @Named("paddleSpawnY") float paddleSpawnY
+            @BindsInstance @Named("paddleSpawnY") float paddleSpawnY,
+            @BindsInstance @Named("logoFontSize") int logoFontSize
         );
     }
 }
