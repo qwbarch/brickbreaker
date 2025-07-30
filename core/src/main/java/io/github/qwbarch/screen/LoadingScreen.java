@@ -7,6 +7,7 @@ import io.github.qwbarch.asset.AssetMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 public final class LoadingScreen implements Screen {
     private final Animation<TextureRegion> loadingAnimation;

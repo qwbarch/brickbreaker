@@ -10,7 +10,9 @@ import io.github.qwbarch.screen.LevelScreen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public final class Level1Screen extends LevelScreen {
     private final EntitySpawner spawner;
     private final float brickSize;

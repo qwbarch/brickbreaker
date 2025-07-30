@@ -117,7 +117,6 @@ public abstract class LevelScreen implements Screen {
     private void clearWorld() {
         var entities = world.getAspectSubscriptionManager().get(Aspect.all()).getEntities();
         for (var i = 0; i < entities.size(); i++) {
-            System.out.println("deleting entity " + entities.get(i));
             world.delete(entities.get(i));
         }
     }
