@@ -63,8 +63,7 @@ public class ScreenHandler implements Disposable {
      */
     public void setScreen(Screen screen) {
         if (!contains(screen)) add(screen);
-        else currentScreen.hide();
-
+        if (currentScreen != null) currentScreen.hide();
         currentScreen = screen;
         currentScreen.show();
     }

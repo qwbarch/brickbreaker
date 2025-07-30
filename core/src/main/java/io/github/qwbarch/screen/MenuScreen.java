@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.MenuButton;
@@ -58,10 +57,12 @@ public final class MenuScreen implements Screen {
         this.logo = logo;
     }
 
-    private void initMenuButtons() {
+    private void setupStage() {
+        // Re-add all components in the case of a screen resize.
+        stage.clear();
+
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
-        var hoverSound = assets.getButtonHoverSound();
 
         var selectLevelButton = new MenuButton("Select Level", assets);
         selectLevelButton.setPosition(
@@ -101,8 +102,6 @@ public final class MenuScreen implements Screen {
         stage.addActor(selectLevelButton);
         stage.addActor(howToPlayButton);
         stage.addActor(quitButton);
-
-        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -118,7 +117,8 @@ public final class MenuScreen implements Screen {
         logoWidth = glyphLayout.width;
         logoHeight = glyphLayout.height;
 
-        initMenuButtons();
+        setupStage();
+        Gdx.input.setInputProcessor(stage);
 
         if (firstRun) {
             firstRun = false;
@@ -126,6 +126,17 @@ public final class MenuScreen implements Screen {
             music.setLooping(0L, true);
             music.play();
         }
+    }
+
+    @Override
+    public void hide() {
+        // Stop the UI from trying to react to inputs.
+        Gdx.input.setInputProcessor(null);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        setupStage();
     }
 
     @Override

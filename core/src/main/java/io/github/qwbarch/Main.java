@@ -151,11 +151,6 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        // ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        // batch.begin();
-        // batch.draw(image, 140, 210);
-        // batch.end();
-
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }
