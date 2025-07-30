@@ -8,9 +8,15 @@ import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
 public class Main implements ApplicationListener {
+    /**
+     * Main background color used to clear the screen with.
+     */
     private static final Color MAIN_BACKGROUND_COLOR =
         Color.valueOf("#3b3b3b"); // Gray color.
 
+    /**
+     * Background colour of the world (inside the playable world bounds).
+     */
     private static final Color WORLD_BACKGROUND_COLOR =
         Color.valueOf("#525252"); // Gray color.
 
@@ -34,6 +40,47 @@ public class Main implements ApplicationListener {
      */
     private final static float BRICK_SIZE = 4f;
 
+    /**
+     * The ball's width/height using in-game units.
+     */
+    private final static float BALL_SIZE = 1.3f;
+
+    /**
+     * The paddle's width using in-game units.
+     */
+    private final static float PADDLE_WIDTH = 12.1f;
+
+    /**
+     * The paddle's height using in-game units.
+     */
+    private final static float PADDLE_HEIGHT = 2.42f;
+
+    /**
+     * The paddle's spawning x-coordinate using in-game units.
+     */
+    private final static float PADDLE_SPAWN_X = (WORLD_WIDTH / 2f) - (PADDLE_WIDTH / 2f);
+
+    /**
+     * The paddle's spawning y-coordinate using in-game units.
+     */
+    private final static float PADDLE_SPAWN_Y = 10f;
+
+    /**
+     * The speed of the paddle using in-game units.
+     */
+    private final static float PADDLE_VELOCITY = 120f;
+
+    /**
+     * The ball's spawning x-coordinate using in-game units.
+     */
+    private final static float STARTING_BALL_SPAWN_X = (WORLD_WIDTH / 2f) - (BALL_SIZE / 2f);
+
+    /**
+     * The ball's spawning y-coordinate using in-game units.
+     */
+    private final static float STARTING_BALL_SPAWN_Y = PADDLE_SPAWN_Y + BALL_SIZE + 2f;
+
+
     private ScreenHandler screenHandler;
 
     @Override
@@ -49,7 +96,15 @@ public class Main implements ApplicationListener {
                         WORLD_WIDTH,
                         WORLD_HEIGHT,
                         WORLD_BACKGROUND_COLOR,
-                        BRICK_SIZE
+                        BRICK_SIZE,
+                        BALL_SIZE,
+                        STARTING_BALL_SPAWN_X,
+                        STARTING_BALL_SPAWN_Y,
+                        PADDLE_WIDTH,
+                        PADDLE_HEIGHT,
+                        PADDLE_VELOCITY,
+                        PADDLE_SPAWN_X,
+                        PADDLE_SPAWN_Y
                     );
         screenHandler = screenComponent.getScreenHandler();
 

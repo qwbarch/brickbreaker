@@ -30,7 +30,15 @@ public interface ScreenComponent {
             @BindsInstance @Named("worldWidth") float worldWidth,
             @BindsInstance @Named("worldHeight") float worldHeight,
             @BindsInstance @Named("worldBackground") Color worldBackground,
-            @BindsInstance @Named("brickSize") float brickSize
+            @BindsInstance @Named("brickSize") float brickSize,
+            @BindsInstance @Named("ballSize") float ballSize,
+            @BindsInstance @Named("startingBallSpawnX") float startingBallSpawnX,
+            @BindsInstance @Named("startingBallSpawnY") float startingBallSpawnY,
+            @BindsInstance @Named("paddleWidth") float paddleWidth,
+            @BindsInstance @Named("paddleHeight") float paddleHeight,
+            @BindsInstance @Named("paddleVelocity") float paddleVelocity,
+            @BindsInstance @Named("paddleSpawnX") float paddleSpawnX,
+            @BindsInstance @Named("paddleSpawnY") float paddleSpawnY
         );
     }
 }

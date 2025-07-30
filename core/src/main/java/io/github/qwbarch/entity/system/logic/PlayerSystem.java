@@ -6,35 +6,31 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import io.github.qwbarch.dagger.scope.ScreenScope;
+import io.github.qwbarch.entity.component.Collider;
 import io.github.qwbarch.entity.component.LinearVelocity;
 import io.github.qwbarch.entity.component.Player;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static io.github.qwbarch.entity.system.logic.MovementCollisionSystem.PASSES;
 
 /**
- * Handles the player input of entities. This is currently only for the player's paddle.
+ * Handles the player input of entities.
  */
 @ScreenScope
 @All({Player.class, LinearVelocity.class})
 public final class PlayerSystem extends IteratingSystem {
-    /**
-     * The speed of the paddle.
-     *
-     * TODO: This shouldn't need to rely on PASSES, but right now MovementCollisionSystem
-     * is slightly bugged where I believe movement is only applied on the first pass.
-     * This causes the paddle to move slower, so as a workaround for now I simply multiply
-     * it by the # of passes.
-     */
-    private static final float PADDLE_VELOCITY = 120 * PASSES;
+    private final float paddleVelocity;
 
     // Component mappers are automatically injected via artemis-odb,
     // which gives access to the entity's components.
     private ComponentMapper<LinearVelocity> velocities;
+    private ComponentMapper<Collider> colliders;
 
     @Inject
-    PlayerSystem() {
+    PlayerSystem(@Named("paddleVelocity") float paddleVelocity) {
+        this.paddleVelocity = paddleVelocity;
     }
 
     /**
@@ -53,7 +49,11 @@ public final class PlayerSystem extends IteratingSystem {
         }
         // Otherwise move the paddle left/right.
         else {
-            velocity.x = isLeftHeld ? -PADDLE_VELOCITY : PADDLE_VELOCITY;
+            // Make it faster by "PASSES" if the entity is a collider.
+            // This is due to a bug in MovementCollisionSystem that makes collider entities
+            // move slower by a factor of "PASSES".
+            var multiplier = colliders.has(entityId) ? (float) PASSES : 1f;
+            velocity.x = (isLeftHeld ? -paddleVelocity : paddleVelocity) * multiplier;
         }
     }
 }

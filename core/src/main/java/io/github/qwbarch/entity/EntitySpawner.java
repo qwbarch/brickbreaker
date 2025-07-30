@@ -1,7 +1,6 @@
 package io.github.qwbarch.entity;
 
 import com.artemis.World;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.component.*;
 
@@ -11,20 +10,38 @@ import javax.inject.Named;
 public final class EntitySpawner {
     private final World world;
     private final AssetMap assets;
-    private final float worldWidth;
     private final float brickSize;
+    private final float ballSize;
+    private final float startingBallSpawnX;
+    private final float startingBallSpawnY;
+    private final float paddleSpawnX;
+    private final float paddleSpawnY;
+    private final float paddleWidth;
+    private final float paddleHeight;
 
     @Inject
     EntitySpawner(
         World world,
         AssetMap assets,
-        @Named("worldWidth") float worldWidth,
-        @Named("brickSize") float brickSize
+        @Named("paddleSpawnX") float paddleSpawnX,
+        @Named("paddleSpawnY") float paddleSpawnY,
+        @Named("paddleWidth") float paddleWidth,
+        @Named("paddleHeight") float paddleHeight,
+        @Named("brickSize") float brickSize,
+        @Named("ballSize") float ballSize,
+        @Named("startingBallSpawnX") float startingBallSpawnX,
+        @Named("startingBallSpawnY") float startingBallSpawnY
     ) {
         this.world = world;
         this.assets = assets;
-        this.worldWidth = worldWidth;
         this.brickSize = brickSize;
+        this.ballSize = ballSize;
+        this.paddleSpawnX = paddleSpawnX;
+        this.paddleSpawnY = paddleSpawnY;
+        this.paddleWidth = paddleWidth;
+        this.paddleHeight = paddleHeight;
+        this.startingBallSpawnX = startingBallSpawnX;
+        this.startingBallSpawnY = startingBallSpawnY;
     }
 
     public void spawnBall(float x, float y, float xVel, float yVel) {
@@ -37,18 +54,43 @@ public final class EntitySpawner {
 
         position.current.set(x, y);
         position.previous.set(position.current);
-
-        size.set(1.3f, 1.3f);
+        size.set(ballSize, ballSize);
         velocity.x = xVel;
         velocity.y = yVel;
-
         sprite.texture = assets.getBallTexture();
-
         collider.bounce = true;
         collider.playImpactSound = true;
     }
 
-    public void spawnPaddle() {
+    public void spawnStartingBall(int paddleId) {
+        var entityId = world.create();
+        var position = world.edit(entityId).create(Position.class);
+        var velocity = world.edit(entityId).create(LinearVelocity.class);
+        var size = world.edit(entityId).create(Size.class);
+        var sprite = world.edit(entityId).create(Sprite.class);
+        world.edit(entityId).create(Player.class);
+
+        position.current.x = startingBallSpawnX;
+        position.current.y = startingBallSpawnY;
+        position.previous.set(position.current);
+        velocity.setZero();
+        size.set(ballSize, ballSize);
+        sprite.texture = assets.getBallTexture();
+
+        // Keep the ball centered on the paddle if the paddle colliders into a world border.
+        world.edit(paddleId).create(CollisionListener.class).listener = (var colliderId, var collidableId) -> {
+            var paddlePosition = world.getMapper(Position.class).get(paddleId);
+            var paddleSize = world.getMapper(Size.class).get(paddleId);
+
+            velocity.setZero();
+
+            // Center the ball.
+            position.current.x = paddlePosition.current.x + paddleSize.width / 2f - ballSize / 2f;
+            position.previous.set(position.current);
+        };
+    }
+
+    public int spawnPaddle() {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
         var size = world.edit(entityId).create(Size.class);
@@ -59,11 +101,11 @@ public final class EntitySpawner {
         world.edit(entityId).create(LinearVelocity.class);
         world.edit(entityId).create(Player.class);
 
-        position.current.x = worldWidth / 2f;
-        position.current.y = 10f;
+        position.current.x = paddleSpawnX;
+        position.current.y = paddleSpawnY;
         position.previous.set(position.current);
 
-        size.set(12.1f, 2.42f);
+        size.set(paddleWidth, paddleHeight);
         sprite.texture = assets.getPaddleTexture();
 
         collider.bounce = false;
@@ -71,6 +113,8 @@ public final class EntitySpawner {
 
         impactSound.sound = assets.getHardBounceSound();
         impactSound.lastPlayedTime = 0f;
+
+        return entityId;
     }
 
     public void spawnInvisibleBorder(float x, float y, float width, float height) {

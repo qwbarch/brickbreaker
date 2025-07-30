@@ -4,7 +4,6 @@ import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
-import com.artemis.annotations.One;
 import com.artemis.utils.IntBag;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.*;
@@ -20,7 +19,6 @@ import javax.inject.Named;
  */
 @ScreenScope
 @All({Position.class, LinearVelocity.class, Size.class})
-@One({Collider.class})
 public final class MovementCollisionSystem extends LogicSystem {
     /**
      * Entities do multiple movement / collision detection passes
@@ -97,7 +95,7 @@ public final class MovementCollisionSystem extends LogicSystem {
         position.previous.set(position.current);
 
         // Do multiple passes to avoid tunneling issue.
-        for (int pass = 0; pass < PASSES; pass++) {
+        for (var pass = 0; pass < PASSES; pass++) {
             // Position at the previous game state (before updating position).
             var previousLeft = position.current.x;
             var previousBottom = position.current.y;
@@ -211,6 +209,9 @@ public final class MovementCollisionSystem extends LogicSystem {
         }
 
         // Run the collision listener function.
+        if (collisionListeners.has(colliderId)) {
+            collisionListeners.get(colliderId).listener.collide(colliderId, collidableId);
+        }
         if (collisionListeners.has(collidableId)) {
             collisionListeners.get(collidableId).listener.collide(colliderId, collidableId);
         }

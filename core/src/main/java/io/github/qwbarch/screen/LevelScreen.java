@@ -96,11 +96,13 @@ public final class LevelScreen implements Screen {
         //ballTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
-        spawner.spawnPaddle();
+        var paddleId = spawner.spawnPaddle();
 
         for (var i = 0; i < 20; i++) {
             spawner.spawnBrick(i * brickSize, worldHeight - brickSize, 1);
         }
+
+        spawner.spawnStartingBall(paddleId);
 
         System.out.println(world.getSystems());
 
@@ -115,18 +117,18 @@ public final class LevelScreen implements Screen {
 
     @Override
     public void render() {
-        accumulator += Gdx.graphics.getDeltaTime();
-        if (spawnedBalls < 1 && accumulator >= 0.0001f) {
-            accumulator -= 0.0001f;
-            spawnedBalls++;
-            var reflect = MathUtils.random(1) == 0;
-            var xVel = (float) MathUtils.random(80, 160);
-            var yVel = (float) MathUtils.random(100, 160);
-            xVel = reflect ? xVel : -xVel;
-            xVel *= .9f;
-            yVel *= .9f;
-            spawner.spawnBall(worldWidth / 2f, worldHeight / 2f, xVel, yVel);
-        }
+        // accumulator += Gdx.graphics.getDeltaTime();
+        // if (spawnedBalls < 1 && accumulator >= 0.0001f) {
+        //     accumulator -= 0.0001f;
+        //     spawnedBalls++;
+        //     var reflect = MathUtils.random(1) == 0;
+        //     var xVel = (float) MathUtils.random(80, 160);
+        //     var yVel = (float) MathUtils.random(100, 160);
+        //     xVel = reflect ? xVel : -xVel;
+        //     xVel *= .9f;
+        //     yVel *= .9f;
+        //     spawner.spawnBall(worldWidth / 2f, worldHeight / 2f, xVel, yVel);
+        // }
         //viewport.apply();
         //camera.update();
         batch.setProjectionMatrix(camera.combined);
