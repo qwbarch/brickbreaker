@@ -93,7 +93,7 @@ public final class LoadingScreen implements Screen {
         // );
 
         // Draw the left logo.
-        logoFont.setColor(207f / 255f, 60f / 255f, 60f / 255f, 1f);
+        logoFont.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
         var leftLogoX = screenWidth / 2f - logoWidth / 2f;
         var logoY = screenHeight / 3f * 2f + logoHeight / 2f;
         logoFont.draw(batch, "Brick", leftLogoX, logoY);
