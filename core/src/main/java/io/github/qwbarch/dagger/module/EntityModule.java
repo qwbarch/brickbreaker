@@ -7,8 +7,8 @@ import dagger.Provides;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.strategy.FixedTimestepInvocationStrategy;
 import io.github.qwbarch.entity.system.RenderSystem;
-import io.github.qwbarch.entity.system.logic.InputSystem;
-import io.github.qwbarch.entity.system.logic.MovementCollisionSystem;
+import io.github.qwbarch.entity.system.InputSystem;
+import io.github.qwbarch.entity.system.MovementCollisionSystem;
 
 @Module
 public final class EntityModule {

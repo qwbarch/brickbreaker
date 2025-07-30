@@ -80,6 +80,11 @@ public class Main implements ApplicationListener {
      */
     private final static float STARTING_BALL_SPAWN_Y = PADDLE_SPAWN_Y + BALL_SIZE + 1.1f;
 
+    /**
+     * The ball's velocity using in-game units.
+     */
+    private final static float BALL_VELOCITY = 120f;
+
 
     private ScreenHandler screenHandler;
 
@@ -98,6 +103,7 @@ public class Main implements ApplicationListener {
                         WORLD_BACKGROUND_COLOR,
                         BRICK_SIZE,
                         BALL_SIZE,
+                        BALL_VELOCITY,
                         STARTING_BALL_SPAWN_X,
                         STARTING_BALL_SPAWN_Y,
                         PADDLE_WIDTH,

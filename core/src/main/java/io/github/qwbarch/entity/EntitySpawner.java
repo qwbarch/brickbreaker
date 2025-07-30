@@ -1,28 +1,24 @@
 package io.github.qwbarch.entity;
 
 import com.artemis.World;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntSet;
-import com.badlogic.gdx.utils.ObjectMap;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.util.HashMap;
-
-import static io.github.qwbarch.entity.system.logic.MovementCollisionSystem.PASSES;
+import static io.github.qwbarch.entity.system.MovementCollisionSystem.PASSES;
 
 public final class EntitySpawner {
     private final World world;
     private final AssetMap assets;
     private final float brickSize;
     private final float ballSize;
+    private final float ballVelocity;
     private final float startingBallSpawnX;
     private final float startingBallSpawnY;
     private final float paddleVelocity;
@@ -30,8 +26,6 @@ public final class EntitySpawner {
     private final float paddleSpawnY;
     private final float paddleWidth;
     private final float paddleHeight;
-
-    private float previousVelocity;
 
     @Inject
     EntitySpawner(
@@ -44,6 +38,7 @@ public final class EntitySpawner {
         @Named("paddleHeight") float paddleHeight,
         @Named("brickSize") float brickSize,
         @Named("ballSize") float ballSize,
+        @Named("ballVelocity") float ballVelocity,
         @Named("startingBallSpawnX") float startingBallSpawnX,
         @Named("startingBallSpawnY") float startingBallSpawnY
     ) {
@@ -51,6 +46,7 @@ public final class EntitySpawner {
         this.assets = assets;
         this.brickSize = brickSize;
         this.ballSize = ballSize;
+        this.ballVelocity = ballVelocity;
         this.paddleVelocity = paddleVelocity;
         this.paddleSpawnX = paddleSpawnX;
         this.paddleSpawnY = paddleSpawnY;
@@ -71,6 +67,15 @@ public final class EntitySpawner {
         }
     }
 
+    private void launchBall(LinearVelocity velocity) {
+        var angle = MathUtils.random(
+            (float) Math.toRadians(10),
+            (float) Math.toRadians(170)
+        );
+        velocity.x = ballVelocity * MathUtils.cos(angle);
+        velocity.y = ballVelocity * MathUtils.sin(angle);
+    }
+
     public void spawnBall(float x, float y, float xVel, float yVel) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
@@ -82,11 +87,10 @@ public final class EntitySpawner {
         position.current.set(x, y);
         position.previous.set(position.current);
         size.set(ballSize, ballSize);
-        velocity.x = xVel;
-        velocity.y = yVel;
         sprite.texture = assets.getBallTexture();
         collider.bounce = true;
         collider.playImpactSound = true;
+        launchBall(velocity);
     }
 
     public void spawnStartingBall(int paddleId) {
@@ -105,13 +109,11 @@ public final class EntitySpawner {
         sprite.texture = assets.getBallTexture();
 
         // Keep the ball centered on the paddle if the paddle colliders into a world border.
-        world.edit(paddleId).create(CollisionListener.class).listener = (var colliderId, var collidableId) -> {
+        var paddleCollisionListener = world.edit(paddleId).create(CollisionListener.class);
+        paddleCollisionListener.listener = (var colliderId, var collidableId) -> {
             var paddlePosition = world.getMapper(Position.class).get(paddleId);
             var paddleSize = world.getMapper(Size.class).get(paddleId);
 
-            if (velocity.x != 0) {
-                previousVelocity = velocity.x;
-            }
             velocity.setZero();
 
             // Center the ball.
@@ -121,11 +123,31 @@ public final class EntitySpawner {
 
         // Move the starting ball left/right using the arrow keys.
         var keysPressed = new IntSet();
+        inputListener.unregister = false;
         inputListener.processor = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 keysPressed.add(keycode);
                 handlePlayerInput(keysPressed, velocity, 1f);
+
+                // Launch the ball.
+                if (keycode == Input.Keys.SPACE) {
+                    launchBall(velocity);
+
+                    // Request the input listener to be removed.
+                    inputListener.unregister = true;
+
+                    // Remove the CollisionListener since it's for centering the ball
+                    // when colliding with the paddle.
+                    paddleCollisionListener.listener = null;
+                    world.edit(entityId).remove(CollisionListener.class);
+
+                    // Make the ball a collider that bounces.
+                    var collider = world.edit(entityId).create(Collider.class);
+                    collider.bounce = true;
+                    collider.playImpactSound = true;
+                }
+
                 return false;
             }
 
@@ -147,7 +169,6 @@ public final class EntitySpawner {
         var sprite = world.edit(entityId).create(Sprite.class);
         var collider = world.edit(entityId).create(Collider.class);
         var impactSound = world.edit(entityId).create(ImpactSound.class);
-        var collisionListener = world.edit(entityId).create(CollisionListener.class);
         var inputListener = world.edit(entityId).create(InputListener.class);
         var velocity = world.edit(entityId).create(LinearVelocity.class);
 
@@ -173,6 +194,7 @@ public final class EntitySpawner {
         // MovementCollisionSystem, where collidable entities move slower by a factor
         // of "PASSES."
         var keysPressed = new IntSet();
+        inputListener.unregister = false;
         inputListener.processor = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
@@ -270,9 +292,9 @@ public final class EntitySpawner {
                             sprite.texture = assets.getGreenBrickTexture();
                             break;
                         case 2:
-                            sprite.texture = assets.getGreenBrickTexture();
+                            sprite.texture = assets.getYellowBrickTexture();
                         case 1:
-                            sprite.texture = assets.getGreenBrickTexture();
+                            sprite.texture = assets.getRedBrickTexture();
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package io.github.qwbarch.entity.system.logic;
+package io.github.qwbarch.entity.system;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -7,7 +7,6 @@ import com.artemis.annotations.All;
 import com.artemis.utils.IntBag;
 import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.*;
-import io.github.qwbarch.entity.system.LogicSystem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -156,7 +155,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                         position.current.x = collidableLeft - size.width;
 
                         if (collider.bounce) velocity.reverseX();
-                        //else velocity.setZero();
+                        else velocity.setZero();
 
                         handleCollision(entityId, collidableId);
                     }
@@ -165,7 +164,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                         position.current.x = collidableRight;
 
                         if (collider.bounce) velocity.reverseX();
-                        //else velocity.setZero();
+                        else velocity.setZero();
 
                         handleCollision(entityId, collidableId);
                     }
@@ -174,14 +173,14 @@ public final class MovementCollisionSystem extends LogicSystem {
                         position.current.y = collidableBottom - size.height;
 
                         if (collider.bounce) velocity.reverseY();
-                        //else velocity.setZero();
+                        else velocity.setZero();
 
                         handleCollision(entityId, collidableId);
                     } else if (previousBottom >= collidableTop) {
                         position.current.y = collidableTop;
 
                         if (collider.bounce) velocity.reverseY();
-                        //else velocity.setZero();
+                        else velocity.setZero();
 
                         handleCollision(entityId, collidableId);
                     }
