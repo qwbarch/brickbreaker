@@ -25,6 +25,7 @@ public final class EntitySpawner {
     private final float paddleSpawnY;
     private final float paddleWidth;
     private final float paddleHeight;
+    private final float spawnBallChance;
     private int paddleId = -1;
 
     @Inject
@@ -41,7 +42,8 @@ public final class EntitySpawner {
         @Named("ballVelocity") float ballVelocity,
         @Named("ballSpawnVelocity") float ballSpawnVelocity,
         @Named("startingBallSpawnX") float startingBallSpawnX,
-        @Named("startingBallSpawnY") float startingBallSpawnY
+        @Named("startingBallSpawnY") float startingBallSpawnY,
+        @Named("spawnBallChance") float spawnBallChance
     ) {
         this.world = world;
         this.assets = assets;
@@ -56,6 +58,7 @@ public final class EntitySpawner {
         this.paddleHeight = paddleHeight;
         this.startingBallSpawnX = startingBallSpawnX;
         this.startingBallSpawnY = startingBallSpawnY;
+        this.spawnBallChance = spawnBallChance;
     }
 
     private void handlePlayerInput(IntSet keysPressed, LinearVelocity velocity) {
@@ -298,10 +301,12 @@ public final class EntitySpawner {
                 impactSound.lastPlayedTime = currentTime;
 
                 // Spawn a dropping ball at a percent change.
-                spawnDroppingBall(
-                    MathUtils.random(position.current.x, position.current.x + size.width),
-                    MathUtils.random(position.current.y, position.current.y + size.height)
-                );
+                if (MathUtils.random() < spawnBallChance) {
+                    spawnDroppingBall(
+                        MathUtils.random(position.current.x, position.current.x + size.width),
+                        MathUtils.random(position.current.y, position.current.y + size.height)
+                    );
+                }
 
                 if (startHitpoints > 3) {
                     // Remaining hp as a percentage, from 0f to 1f;

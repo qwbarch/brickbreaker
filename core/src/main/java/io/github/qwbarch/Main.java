@@ -106,6 +106,11 @@ public class Main implements ApplicationListener {
      */
     private static final String LOGO = LEFT_LOGO + " " + RIGHT_LOGO;
 
+    /**
+     * Chance to spawn a ball from hitting a brick.
+     */
+    private static final float SPAWN_BALL_CHANCE = 0.1f;
+
     private ScreenHandler screenHandler;
     private AssetMap assets;
 
@@ -135,7 +140,8 @@ public class Main implements ApplicationListener {
                         PADDLE_SPAWN_Y,
                         LEFT_LOGO,
                         RIGHT_LOGO,
-                        LOGO
+                        LOGO,
+                        SPAWN_BALL_CHANCE
                     );
         screenHandler = screenComponent.getScreenHandler();
         assets = screenComponent.getAssets();

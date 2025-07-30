@@ -47,7 +47,8 @@ public interface ScreenComponent {
             @BindsInstance @Named("paddleSpawnY") float paddleSpawnY,
             @BindsInstance @Named("leftLogo") String leftLogo,
             @BindsInstance @Named("rightLogo") String rightLogo,
-            @BindsInstance @Named("logo") String logo
+            @BindsInstance @Named("logo") String logo,
+            @BindsInstance @Named("spawnBallChance") float spawnBallChance
         );
     }
 }
