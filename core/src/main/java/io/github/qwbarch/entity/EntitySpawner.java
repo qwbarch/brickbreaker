@@ -10,7 +10,9 @@ import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public final class EntitySpawner {
     private final World world;
     private final AssetMap assets;

@@ -2,11 +2,11 @@ package io.github.qwbarch.screen;
 
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@ScreenScope
+@Singleton
 public class ScreenHandler implements Disposable {
     /**
      * The currently visible screen.

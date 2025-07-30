@@ -4,19 +4,19 @@ import com.artemis.ComponentMapper;
 import com.artemis.annotations.All;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.Position;
 import io.github.qwbarch.entity.component.Size;
 import io.github.qwbarch.entity.component.Sprite;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * System that takes in an alpha value for interpolating between steps, meant for rendering graphics.
  * Defaults to acting as an IteratingSystem if TimestepInvocationStrategy is not registered to the world.
  */
-@ScreenScope
 @All({Position.class, Size.class, Sprite.class})
+@Singleton
 public final class RenderSystem extends IteratingSystem {
     public float alpha = 1f;
 

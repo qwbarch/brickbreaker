@@ -8,8 +8,7 @@ import io.github.qwbarch.entity.system.RenderSystem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-// TODO: USE ArrayMap INSTEAD.
+import javax.inject.Singleton;
 
 /**
  * Implements a fixed timestep game loop.
@@ -26,6 +25,7 @@ import javax.inject.Named;
  * These maps are set to unordered via a property since I don't actually care about the iteration order
  * of these systems. OrderedMap set to unordered still iterates faster than ObjectMap.
  */
+@Singleton
 public final class FixedTimestepInvocationStrategy extends SystemInvocationStrategy {
     /**
      * Time in seconds per game tick.

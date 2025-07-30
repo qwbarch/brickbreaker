@@ -11,13 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.screen.level.Level1Screen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-@ScreenScope
+@Singleton
 public final class MenuScreen implements Screen {
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;

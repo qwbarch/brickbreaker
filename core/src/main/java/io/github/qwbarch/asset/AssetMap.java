@@ -11,12 +11,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Singleton;
 
-@ScreenScope
+@Singleton
 public final class AssetMap implements Disposable {
     private static final String BALL_TEXTURE_PATH = "ball.png";
     private static final String PADDLE_TEXTURE_PATH = "paddle.jpg";

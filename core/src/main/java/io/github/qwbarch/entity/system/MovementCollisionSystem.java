@@ -5,19 +5,19 @@ import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
 import com.artemis.utils.IntBag;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Handles the movement and collision of entities.<br />
  * Why both at once? It was originally separated, but I couldn't figure out how to avoid the tunneling issue
  * without doing multiple passes in a single game tick. <br />
  */
-@ScreenScope
 @All({Position.class, LinearVelocity.class, Size.class})
+@Singleton
 public final class MovementCollisionSystem extends LogicSystem {
     /**
      * Entities do multiple movement / collision detection passes

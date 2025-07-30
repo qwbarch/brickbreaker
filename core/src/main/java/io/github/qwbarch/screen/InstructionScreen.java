@@ -13,11 +13,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dagger.Lazy;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@ScreenScope
+@Singleton
 public final class InstructionScreen implements Screen {
     private static final String HEADER = "How To Play";
 

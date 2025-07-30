@@ -4,19 +4,20 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Module;
 import dagger.Provides;
-import io.github.qwbarch.dagger.scope.ClientScope;
+
+import javax.inject.Singleton;
 
 @Module
 public final class RenderModule {
     @Provides
-    @ClientScope
+    @Singleton
     public SpriteBatch provideSpriteBatch() {
         System.out.println("provideSpriteBatch");
         return new SpriteBatch();
     }
 
     @Provides
-    @ClientScope
+    @Singleton
     public GlyphLayout provideGlyphLayout() {
         System.out.println("provideGlyphLayout");
         return new GlyphLayout();

@@ -2,9 +2,9 @@ package io.github.qwbarch;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.component.DaggerClientComponent;
 import io.github.qwbarch.dagger.component.DaggerScreenComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
@@ -111,18 +111,18 @@ public class Main implements ApplicationListener {
      */
     private static final float SPAWN_BALL_CHANCE = 0.1f;
 
+    private final FPSLogger fpsLogger = new FPSLogger();
+
     private ScreenHandler screenHandler;
     private AssetMap assets;
 
     @Override
     public void create() {
         // Startup dependency injection.
-        var clientComponent = DaggerClientComponent.create();
         var screenComponent =
                 DaggerScreenComponent
                     .factory()
                     .create(
-                        clientComponent,
                         SECONDS_PER_TICK,
                         WORLD_WIDTH,
                         WORLD_HEIGHT,
@@ -157,6 +157,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
+        //fpsLogger.log();
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }

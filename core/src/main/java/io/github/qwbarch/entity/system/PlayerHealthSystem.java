@@ -4,7 +4,6 @@ import com.artemis.Aspect;
 import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
-import com.artemis.annotations.All;
 import com.artemis.utils.IntBag;
 import io.github.qwbarch.entity.component.PlayerHealth;
 import io.github.qwbarch.screen.GameOverScreen;
@@ -12,7 +11,9 @@ import io.github.qwbarch.screen.Screen;
 import io.github.qwbarch.screen.ScreenHandler;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class PlayerHealthSystem extends BaseSystem  {
     private final ScreenHandler screenHandler;
     private final Screen gameOverScreen;

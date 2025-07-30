@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
 import io.github.qwbarch.entity.EntitySpawner;
-import io.github.qwbarch.entity.component.Position;
 import io.github.qwbarch.screen.LevelScreen;
 
 import javax.inject.Inject;

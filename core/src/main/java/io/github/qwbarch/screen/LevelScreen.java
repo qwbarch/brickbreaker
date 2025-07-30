@@ -2,24 +2,12 @@ package io.github.qwbarch.screen;
 
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 import io.github.qwbarch.entity.EntitySpawner;
-import io.github.qwbarch.entity.component.LinearVelocity;
-import io.github.qwbarch.entity.component.Position;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@ScreenScope
 public abstract class LevelScreen implements Screen {
     private final World world;
     private final SpriteBatch batch;
@@ -27,10 +15,8 @@ public abstract class LevelScreen implements Screen {
     private final float worldWidth;
     private final float worldHeight;
     private final Texture background;
-
-    private Viewport viewport;
-    private Camera camera = new OrthographicCamera();
-    private FPSLogger fpsLogger = new FPSLogger();
+    private final Camera camera = new OrthographicCamera();
+    private final Viewport viewport;
 
     protected LevelScreen(
         World world,
@@ -111,8 +97,6 @@ public abstract class LevelScreen implements Screen {
 
         // batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
         world.process();
-
-        fpsLogger.log();
 
         batch.end();
     }

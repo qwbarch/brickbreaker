@@ -11,8 +11,10 @@ import com.badlogic.gdx.InputMultiplexer;
 import io.github.qwbarch.entity.component.InputListener;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @All(InputListener.class)
+@Singleton
 public final class InputSystem extends IteratingSystem {
     /**
      * A class that allows us to register multiple input processors at once.

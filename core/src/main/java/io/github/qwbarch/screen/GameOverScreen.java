@@ -16,7 +16,9 @@ import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.screen.level.Level1Screen;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public final class GameOverScreen implements Screen {
     private static final String HEADER = "You died. Game over!";
 

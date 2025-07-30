@@ -1,16 +1,13 @@
 package io.github.qwbarch.screen;
 
-import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.holidaystudios.tools.GifDecoder;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.scope.ScreenScope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-@ScreenScope
 public final class LoadingScreen implements Screen {
     private final Animation<TextureRegion> loadingAnimation;
 
@@ -35,7 +32,6 @@ public final class LoadingScreen implements Screen {
         GlyphLayout glyphLayout,
         MenuScreen menuScreen,
         AssetMap assets,
-        World world,
         SpriteBatch batch,
         @Named("leftLogo") String leftLogo,
         @Named("rightLogo") String rightLogo,

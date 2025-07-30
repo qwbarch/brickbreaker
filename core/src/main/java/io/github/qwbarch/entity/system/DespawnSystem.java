@@ -7,8 +7,10 @@ import io.github.qwbarch.entity.component.Position;
 import io.github.qwbarch.entity.component.Size;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @All({Position.class, Size.class, Despawnable.class})
+@Singleton
 public class DespawnSystem extends LogicSystem {
     private ComponentMapper<Position> positions;
     private ComponentMapper<Size> sizes;
