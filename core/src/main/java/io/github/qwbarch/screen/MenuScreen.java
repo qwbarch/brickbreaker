@@ -4,12 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import io.github.qwbarch.asset.AssetMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public final class MenuScreen implements  Screen{
+public final class MenuScreen implements Screen {
+    private final Stage stage = new Stage(new ScreenViewport());
+    private Skin skin;
+
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final GlyphLayout glyphLayout;
@@ -18,7 +27,7 @@ public final class MenuScreen implements  Screen{
     private final String rightLogo;
     private final String logo;
 
-    private BitmapFont logoFont;
+    private BitmapFont font;
     private float rightLogoWidth;
     private float logoWidth;
     private float logoHeight;
@@ -46,18 +55,66 @@ public final class MenuScreen implements  Screen{
         this.logo = logo;
     }
 
+    private void initMenuButtons() {
+        var screenWidth = Gdx.graphics.getWidth();
+        var screenHeight = Gdx.graphics.getHeight();
+
+        var selectLevelButton = new TextButton("Select Level", skin);
+        selectLevelButton.setPosition(
+            screenWidth/ 2f - selectLevelButton.getWidth() / 2f,
+            screenHeight - logoHeight * 7f
+        );
+        selectLevelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+            }
+        });
+
+        var howToPlayButton = new TextButton("How To Play", skin);
+        howToPlayButton.setPosition(
+            screenWidth/ 2f - howToPlayButton.getWidth() / 2f,
+            screenHeight - logoHeight * 8f
+        );
+        howToPlayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+            }
+        });
+
+        var quitButton = new TextButton("Quit Game", skin);
+        quitButton.setPosition(
+            screenWidth/ 2f - quitButton.getWidth() / 2f,
+            screenHeight - logoHeight * 9f
+        );
+        quitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.exit();
+            }
+        });
+
+        stage.addActor(selectLevelButton);
+        stage.addActor(howToPlayButton);
+        stage.addActor(quitButton);
+
+        Gdx.input.setInputProcessor(stage);
+    }
+
     @Override
     public void show() {
-        logoFont = assets.getMainFont();
+        font = assets.getMainFont();
+        skin = new Skin(Gdx.files.internal("comic-ui/comic-ui.json"));
 
         // Calculate dimensions of the right side of the logo.
-        glyphLayout.setText(logoFont, rightLogo);
+        glyphLayout.setText(font, rightLogo);
         rightLogoWidth = glyphLayout.width;
 
         // Calculate dimensions of the combined logo.
-        glyphLayout.setText(logoFont, logo);
+        glyphLayout.setText(font, logo);
         logoWidth = glyphLayout.width;
         logoHeight = glyphLayout.height;
+
+        initMenuButtons();
 
         if (firstRun) {
             firstRun = false;
@@ -76,14 +133,14 @@ public final class MenuScreen implements  Screen{
         batch.begin();
 
         // Draw the left logo.
-        logoFont.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
+        font.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
         var leftLogoX = screenWidth / 2f - logoWidth / 2f;
-        var logoY = screenHeight - logoHeight * 1.5f;
-        logoFont.draw(batch, leftLogo, leftLogoX, logoY);
+        var logoY = screenHeight - logoHeight * 4f;
+        font.draw(batch, leftLogo, leftLogoX, logoY);
 
         // Draw the right logo.
-        logoFont.setColor(1f, 1f, 1f, 1f);
-        logoFont.draw(
+        font.setColor(1f, 1f, 1f, 1f);
+        font.draw(
             batch,
             rightLogo,
             leftLogoX + logoWidth - rightLogoWidth,
@@ -91,5 +148,14 @@ public final class MenuScreen implements  Screen{
         );
 
         batch.end();
+
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+        skin.dispose();
     }
 }
