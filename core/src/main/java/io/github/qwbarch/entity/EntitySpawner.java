@@ -253,20 +253,11 @@ public final class EntitySpawner {
         // If brick has 3+ hp, start as a green brick.
         if (startHitpoints > 2) {
             sprite.texture = assets.getGreenBrickTexture();
-        } else if (startHitpoints > 0) {
-            switch (startHitpoints) {
-                // If brick starts with 2 hp, start as a yellow brick.
-                case 2:
-                    sprite.texture = assets.getYellowBrickTexture();
-                    break;
-                // If brick starts with 1 hp, start as a red brick.
-                case 1:
-                    sprite.texture = assets.getRedBrickTexture();
-                    break;
-            }
-        }
-        // If starting hitpoints is negative, this is an invulnerable brick.
-        else {
+        } else if (startHitpoints == 2) {
+            sprite.texture = assets.getYellowBrickTexture();
+        } else if (startHitpoints == 1) {
+            sprite.texture = assets.getRedBrickTexture();
+        } else if (startHitpoints < 0) {
             sprite.texture = assets.getGreyBrickTexture();
         }
 
@@ -276,26 +267,22 @@ public final class EntitySpawner {
         hitpoints.value = startHitpoints;
 
         collisionListener.listener = (var colliderId, var brickId) -> {
-            if (hitpoints.value > 0) {
+            var currentTime = System.nanoTime();
+            var timeSinceLastHit = (currentTime - hitpoints.lastHitTime) / 1_000_000_000f;
+            if (hitpoints.value > 0 && timeSinceLastHit > 0.1f) {
                 hitpoints.value -= 1;
-
-                // Remaining hp as a percentage, from 0f to 1f;
-                var remainingHitpoints = (float) hitpoints.value / (float) startHitpoints;
+                impactSound.lastPlayedTime = currentTime;
 
                 if (startHitpoints > 3) {
+                    // Remaining hp as a percentage, from 0f to 1f;
+                    var remainingHitpoints = (float) hitpoints.value / (float) startHitpoints;
                     if (remainingHitpoints > 0.6f) sprite.texture = assets.getGreenBrickTexture();
                     else if (remainingHitpoints > 0.3f) sprite.texture = assets.getYellowBrickTexture();
                     else sprite.texture = assets.getRedBrickTexture();
-                } else {
-                    switch (hitpoints.value) {
-                        case 3:
-                            sprite.texture = assets.getGreenBrickTexture();
-                            break;
-                        case 2:
-                            sprite.texture = assets.getYellowBrickTexture();
-                        case 1:
-                            sprite.texture = assets.getRedBrickTexture();
-                    }
+                } else if (hitpoints.value == 2) {
+                    sprite.texture = assets.getYellowBrickTexture();
+                } else if (hitpoints.value == 1) {
+                    sprite.texture = assets.getRedBrickTexture();
                 }
             }
 

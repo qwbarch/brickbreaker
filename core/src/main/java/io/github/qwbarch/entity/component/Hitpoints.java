@@ -6,4 +6,5 @@ import com.artemis.annotations.PooledWeaver;
 @PooledWeaver
 public final class Hitpoints extends Component {
     public int value;
+    public float lastHitTime;
 }
