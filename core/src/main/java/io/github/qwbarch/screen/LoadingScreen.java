@@ -21,6 +21,7 @@ public final class LoadingScreen implements Screen {
 
     private final SpriteBatch batch;
     private final ScreenHandler screenHandler;
+    private final MenuScreen menuScreen;
     private final LevelScreen levelScreen;
     private final AssetMap assets;
     private final BitmapFont logoFont;
@@ -38,6 +39,7 @@ public final class LoadingScreen implements Screen {
     @Inject
     LoadingScreen(
         ScreenHandler screenHandler,
+        MenuScreen menuScreen,
         LevelScreen levelScreen,
         AssetMap assets,
         World world,
@@ -46,6 +48,7 @@ public final class LoadingScreen implements Screen {
     ) {
         this.batch = batch;
         this.screenHandler = screenHandler;
+        this.menuScreen = menuScreen;
         this.levelScreen = levelScreen;
         this.assets = assets;
 
@@ -83,14 +86,14 @@ public final class LoadingScreen implements Screen {
         batch.begin();
 
         // Draw the current loading animation frame.
-        // var loadingFrame = loadingAnimation.getKeyFrame(elapsedTime);
-        // batch.draw(
-        //     loadingFrame,
-        //     Gdx.graphics.getWidth() / 2f - loadingFrame.getRegionWidth() / 2f,
-        //     Gdx.graphics.getHeight() / 2f - loadingFrame.getRegionHeight() / 2f - logoTexture.getHeight(),
-        //     loadingFrame.getRegionWidth(),
-        //     loadingFrame.getRegionHeight()
-        // );
+        var loadingFrame = loadingAnimation.getKeyFrame(elapsedTime);
+        batch.draw(
+            loadingFrame,
+            Gdx.graphics.getWidth() / 2f - loadingFrame.getRegionWidth() / 1.9f,
+            Gdx.graphics.getHeight() / 2f - loadingFrame.getRegionHeight() / 2f,
+            loadingFrame.getRegionWidth(),
+            loadingFrame.getRegionHeight()
+        );
 
         // Draw the left logo.
         logoFont.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
@@ -116,9 +119,6 @@ public final class LoadingScreen implements Screen {
         } else {
             assets.update();
             if (assets.isFinishedLoading()) {
-                var music = assets.getBackgroundMusic();
-                music.setLooping(0L, true);
-                music.play();
                 //screenHandler.setScreen(levelScreen);
             }
         }

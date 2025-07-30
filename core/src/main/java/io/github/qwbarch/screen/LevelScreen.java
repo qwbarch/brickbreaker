@@ -48,6 +48,7 @@ public final class LevelScreen implements Screen {
         @Named("brickSize") float brickSize,
         @Named("worldBackground") Color worldBackground
     ) {
+        System.out.println("LevelScreen constructor");
         this.world = world;
         this.assets = assets;
         this.batch = batch;
