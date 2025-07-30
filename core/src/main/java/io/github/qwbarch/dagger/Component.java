@@ -1,31 +1,29 @@
-package io.github.qwbarch.dagger.component;
+package io.github.qwbarch.dagger;
 
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import dagger.Binds;
 import dagger.BindsInstance;
-import dagger.Component;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.module.EntityModule;
-import io.github.qwbarch.dagger.module.RenderModule;
 import io.github.qwbarch.screen.LoadingScreen;
 import io.github.qwbarch.screen.ScreenHandler;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Component(modules = {EntityModule.class, RenderModule.class})
+@dagger.Component(modules = {Module.class})
 @Singleton
-public interface ScreenComponent {
+public interface Component {
     ScreenHandler getScreenHandler();
 
     LoadingScreen getLoadingScreen();
 
     AssetMap getAssets();
 
-    @Component.Factory
+    InputMultiplexer getInputMultiplexer();
+
+    @dagger.Component.Factory
     interface Factory {
-        ScreenComponent create(
+        Component create(
             @BindsInstance @Named("secondsPerTick") float secondsPerTick,
             @BindsInstance @Named("worldWidth") float worldWidth,
             @BindsInstance @Named("worldHeight") float worldHeight,

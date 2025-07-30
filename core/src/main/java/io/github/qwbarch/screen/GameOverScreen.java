@@ -1,6 +1,7 @@
 package io.github.qwbarch.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,6 +25,7 @@ public final class GameOverScreen implements Screen {
 
     private final Viewport viewport = new ScreenViewport();
 
+    private final InputMultiplexer inputMultiplexer;
     private final AssetMap assets;
     private final GlyphLayout glyphLayout;
     private final SpriteBatch batch;
@@ -39,6 +41,7 @@ public final class GameOverScreen implements Screen {
 
     @Inject
     GameOverScreen(
+        InputMultiplexer inputMultiplexer,
         AssetMap assets,
         GlyphLayout glyphLayout,
         SpriteBatch batch,
@@ -46,6 +49,7 @@ public final class GameOverScreen implements Screen {
         Lazy<Level1Screen> level1Screen,
         Lazy<MenuScreen> menuScreen
     ) {
+        this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
         this.batch = batch;
@@ -112,12 +116,17 @@ public final class GameOverScreen implements Screen {
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         setupStage();
-        Gdx.input.setInputProcessor(stage);
+        inputMultiplexer.addProcessor(stage);
     }
 
     @Override
     public void hide() {
-        Gdx.input.setInputProcessor(null);
+        dispose();
+    }
+
+    @Override
+    public void dispose() {
+        inputMultiplexer.removeProcessor(stage);
     }
 
     @Override

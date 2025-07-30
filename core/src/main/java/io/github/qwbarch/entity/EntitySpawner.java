@@ -121,6 +121,8 @@ public final class EntitySpawner {
     public void spawnStartingBall() {
         if (paddleId < 0) throw new RuntimeException("Paddle has not been initialized yet.");
 
+        System.out.println("spawned starting balll");
+
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
         var velocity = world.edit(entityId).create(LinearVelocity.class);
@@ -152,20 +154,19 @@ public final class EntitySpawner {
 
         // Move the starting ball left/right using the arrow keys.
         var keysPressed = new IntSet();
-        inputListener.unregister = false;
         inputListener.processor = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 keysPressed.add(keycode);
                 handlePlayerInput(keysPressed, velocity);
+                System.out.println("key pressed");
 
                 // Launch the ball.
                 if (keycode == Input.Keys.SPACE) {
                     launchBall(velocity);
                     assets.getBallSpawnSound().play();
 
-                    // Request the input listener to be removed.
-                    inputListener.unregister = true;
+                    world.edit(entityId).remove(InputListener.class);
 
                     // Remove the CollisionListener since it's for centering the ball
                     // when colliding with the paddle.
@@ -227,7 +228,6 @@ public final class EntitySpawner {
         // MovementCollisionSystem, where collidable entities move slower by a factor
         // of "PASSES."
         var keysPressed = new IntSet();
-        inputListener.unregister = false;
         inputListener.processor = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {

@@ -1,33 +1,29 @@
 package io.github.qwbarch.entity.system;
 
 import com.artemis.Aspect;
+import com.artemis.BaseSystem;
 import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
-import com.artemis.annotations.All;
-import com.artemis.systems.IteratingSystem;
 import com.artemis.utils.IntBag;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.utils.IntMap;
 import io.github.qwbarch.entity.component.InputListener;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@All(InputListener.class)
 @Singleton
-public final class InputSystem extends IteratingSystem {
-    /**
-     * A class that allows us to register multiple input processors at once.
-     */
-    private final InputMultiplexer multiplexer = new InputMultiplexer();
-
-    // TODO: THIS IS A WORKAROUND FOR A BUG, MAKE MULTIPLEXER NOT LOCAL TO HERE.
-    private boolean firstRun = true;
-
+public final class InputSystem extends BaseSystem {
     private ComponentMapper<InputListener> inputListeners;
 
+    private final InputMultiplexer inputMultiplexer;
+    private final IntMap<InputProcessor> inputProcessors = new IntMap<>();
+
     @Inject
-    InputSystem() {}
+    InputSystem(InputMultiplexer inputMultiplexer) {
+        this.inputMultiplexer = inputMultiplexer;
+    }
 
     @Override
     protected void initialize() {
@@ -38,32 +34,26 @@ public final class InputSystem extends IteratingSystem {
                     var entityId = entities.get(i);
                     var inputProcessor = inputListeners.get(entityId).processor;
                     if (inputProcessor != null) {
-                        multiplexer.addProcessor((inputProcessor));
+                        System.out.println("InputSystem addProcessor");
+                        inputProcessors.put(entityId, inputProcessor);
+                        inputMultiplexer.addProcessor((inputProcessor));
                     }
                 }
             }
 
             @Override
-            public void removed(IntBag intBag) {
+            public void removed(IntBag entities) {
+                for (var i = 0; i < entities.size(); i++) {
+                    var entityId = entities.get(i);
+                    if (inputProcessors.containsKey(entityId)) {
+                        System.out.println("removing processor");
+                        inputMultiplexer.removeProcessor(inputProcessors.get(entityId));
+                    }
+                }
             }
         });
     }
 
     @Override
-    protected void begin() {
-        if (firstRun) {
-            firstRun = false;
-            Gdx.input.setInputProcessor(multiplexer);
-        }
-    }
-
-    @Override
-    protected void process(int entityId) {
-        var inputListener = inputListeners.get(entityId);
-        if (inputListener.processor != null && inputListener.unregister) {
-            multiplexer.removeProcessor(inputListener.processor);
-            inputListener.processor = null;
-            world.edit(entityId).remove(InputListener.class);
-        }
-    }
+    protected void processSystem() { }
 }

@@ -1,5 +1,7 @@
 package io.github.qwbarch.screen;
 
+import com.artemis.Aspect;
+import com.artemis.EntitySubscription;
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -7,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.qwbarch.entity.EntitySpawner;
+import io.github.qwbarch.entity.component.InputListener;
 
 public abstract class LevelScreen implements Screen {
     private final World world;
@@ -70,6 +73,16 @@ public abstract class LevelScreen implements Screen {
     }
 
     @Override
+    public void hide() {
+        clearWorld();
+    }
+
+    @Override
+    public void dispose() {
+        hide();
+    }
+
+    @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
@@ -99,5 +112,13 @@ public abstract class LevelScreen implements Screen {
         world.process();
 
         batch.end();
+    }
+
+    private void clearWorld() {
+        var entities = world.getAspectSubscriptionManager().get(Aspect.all()).getEntities();
+        for (var i = 0; i < entities.size(); i++) {
+            System.out.println("deleting entity " + entities.get(i));
+            world.delete(entities.get(i));
+        }
     }
 }

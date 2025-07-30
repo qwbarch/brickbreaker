@@ -1,16 +1,18 @@
-package io.github.qwbarch.dagger.module;
+package io.github.qwbarch.dagger;
 
 import com.artemis.World;
 import com.artemis.WorldConfigurationBuilder;
-import dagger.Module;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Provides;
 import io.github.qwbarch.entity.strategy.FixedTimestepInvocationStrategy;
 import io.github.qwbarch.entity.system.*;
 
 import javax.inject.Singleton;
 
-@Module
-public final class EntityModule {
+@dagger.Module
+public final class Module {
     /**
      * Provider method for the entity component system world with all its systems enabled.
      * A new instance is created for every injection site (e.g. new world per screen).
@@ -36,5 +38,25 @@ public final class EntityModule {
                 .register(strategy)
                 .build()
         );
+    }
+
+    @Provides
+    @Singleton
+    public SpriteBatch provideSpriteBatch() {
+        System.out.println("provideSpriteBatch");
+        return new SpriteBatch();
+    }
+
+    @Provides
+    @Singleton
+    public GlyphLayout provideGlyphLayout() {
+        System.out.println("provideGlyphLayout");
+        return new GlyphLayout();
+    }
+
+    @Provides
+    @Singleton
+    public InputMultiplexer provideInputMultiplexer() {
+        return new InputMultiplexer();
     }
 }

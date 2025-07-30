@@ -1,11 +1,12 @@
 package io.github.qwbarch;
 
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.utils.ScreenUtils;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.dagger.component.DaggerScreenComponent;
+import io.github.qwbarch.dagger.DaggerComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
 public class Main implements ApplicationListener {
@@ -119,8 +120,8 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         // Startup dependency injection.
-        var screenComponent =
-                DaggerScreenComponent
+        var component =
+                DaggerComponent
                     .factory()
                     .create(
                         SECONDS_PER_TICK,
@@ -143,15 +144,17 @@ public class Main implements ApplicationListener {
                         LOGO,
                         SPAWN_BALL_CHANCE
                     );
-        screenHandler = screenComponent.getScreenHandler();
-        assets = screenComponent.getAssets();
+        screenHandler = component.getScreenHandler();
+        assets = component.getAssets();
+        Gdx.input.setInputProcessor(component.getInputMultiplexer());
 
         // Start the loading screen.
-        screenHandler.setScreen(screenComponent.getLoadingScreen());
+        screenHandler.setScreen(component.getLoadingScreen());
     }
 
     @Override
     public void resize(int width, int height) {
+        System.out.println("resize called");
         screenHandler.getCurrentScreen().resize(width, height);
     }
 
@@ -164,6 +167,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void pause() {
+        System.out.println("pause called");
         screenHandler.getCurrentScreen().pause();
     }
 
@@ -175,6 +179,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void dispose() {
+        System.out.println("dispose called");
         screenHandler.getCurrentScreen().dispose();
         assets.dispose();
     }

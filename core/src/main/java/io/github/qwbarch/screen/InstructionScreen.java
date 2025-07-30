@@ -1,6 +1,7 @@
 package io.github.qwbarch.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -21,6 +22,7 @@ import javax.inject.Singleton;
 public final class InstructionScreen implements Screen {
     private static final String HEADER = "How To Play";
 
+    private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
     private final Lazy<MenuScreen> menuScreen;
     private final SpriteBatch batch;
@@ -34,6 +36,7 @@ public final class InstructionScreen implements Screen {
 
     @Inject
     InstructionScreen(
+        InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
         Lazy<MenuScreen> menuScreen,
         SpriteBatch batch,
@@ -41,6 +44,7 @@ public final class InstructionScreen implements Screen {
         GlyphLayout glyphLayout
     ) {
         System.out.println("InstructionScreen constructor");
+        this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
         this.menuScreen = menuScreen;
         this.batch = batch;
@@ -105,12 +109,17 @@ public final class InstructionScreen implements Screen {
         headerHeight = glyphLayout.height;
 
         setupStage();
-        Gdx.input.setInputProcessor(stage);
+        inputMultiplexer.addProcessor(stage);
     }
 
     @Override
     public void hide() {
-        Gdx.input.setInputProcessor(null);
+        inputMultiplexer.removeProcessor(stage);
+    }
+
+    @Override
+    public void dispose() {
+        inputMultiplexer.removeProcessor(stage);
     }
 
     @Override

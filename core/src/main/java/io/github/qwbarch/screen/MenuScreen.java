@@ -1,6 +1,7 @@
 package io.github.qwbarch.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,6 +20,7 @@ import javax.inject.Singleton;
 
 @Singleton
 public final class MenuScreen implements Screen {
+    private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;
     private final Screen instructionScreen;
@@ -41,6 +43,7 @@ public final class MenuScreen implements Screen {
 
     @Inject
     MenuScreen(
+        InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
         Level1Screen level1Screen,
         InstructionScreen instructionScreen,
@@ -52,6 +55,7 @@ public final class MenuScreen implements Screen {
         @Named("logo") String logo
     ) {
         System.out.println("MenuScreen constructor");
+        this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
         this.level1Screen = level1Screen;
         this.instructionScreen = instructionScreen;
@@ -132,7 +136,7 @@ public final class MenuScreen implements Screen {
         logoHeight = glyphLayout.height;
 
         setupStage();
-        Gdx.input.setInputProcessor(stage);
+        inputMultiplexer.addProcessor(stage);
 
         if (firstRun) {
             firstRun = false;
@@ -144,8 +148,7 @@ public final class MenuScreen implements Screen {
 
     @Override
     public void hide() {
-        // Stop the UI from trying to react to inputs.
-        Gdx.input.setInputProcessor(null);
+        inputMultiplexer.removeProcessor(stage);
     }
 
     @Override
@@ -182,6 +185,7 @@ public final class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
+        inputMultiplexer.removeProcessor(stage);
         stage.dispose();
     }
 }
