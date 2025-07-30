@@ -87,6 +87,11 @@ public class Main implements ApplicationListener {
     private final static float BALL_VELOCITY = 120f;
 
     /**
+     * The velocity of the spawned ball dropping towards the ground.
+     */
+    private final static float BALL_SPAWN_VELOCITY = 30f;
+
+    /**
      * The left part of the logo.
      */
     private static final String LEFT_LOGO = "Brick";
@@ -120,6 +125,7 @@ public class Main implements ApplicationListener {
                         BRICK_SIZE,
                         BALL_SIZE,
                         BALL_VELOCITY,
+                        BALL_SPAWN_VELOCITY,
                         STARTING_BALL_SPAWN_X,
                         STARTING_BALL_SPAWN_Y,
                         PADDLE_WIDTH,

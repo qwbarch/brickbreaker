@@ -14,6 +14,12 @@ import com.artemis.annotations.PooledWeaver;
 @PooledWeaver
 public final class Collider extends Component {
     /**
+     * If true, the entity is ghosted and can move through entities. Collision listeners will still trigger.
+     * If false, the entity cannot move through entities.
+     */
+    public boolean ghosted;
+
+    /**
      * If true, the entity will bounce (reverse its velocity) if it collides into a "Collidable" entity.
      * If false, the entity's velocity will be set to 0.
      */

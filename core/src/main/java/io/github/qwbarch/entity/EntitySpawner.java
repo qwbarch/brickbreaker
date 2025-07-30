@@ -19,6 +19,7 @@ public final class EntitySpawner {
     private final float brickSize;
     private final float ballSize;
     private final float ballVelocity;
+    private final float ballSpawnVelocity;
     private final float startingBallSpawnX;
     private final float startingBallSpawnY;
     private final float paddleVelocity;
@@ -39,6 +40,7 @@ public final class EntitySpawner {
         @Named("brickSize") float brickSize,
         @Named("ballSize") float ballSize,
         @Named("ballVelocity") float ballVelocity,
+        @Named("ballSpawnVelocity") float ballSpawnVelocity,
         @Named("startingBallSpawnX") float startingBallSpawnX,
         @Named("startingBallSpawnY") float startingBallSpawnY
     ) {
@@ -47,6 +49,7 @@ public final class EntitySpawner {
         this.brickSize = brickSize;
         this.ballSize = ballSize;
         this.ballVelocity = ballVelocity;
+        this.ballSpawnVelocity = ballSpawnVelocity;
         this.paddleVelocity = paddleVelocity;
         this.paddleSpawnX = paddleSpawnX;
         this.paddleSpawnY = paddleSpawnY;
@@ -56,14 +59,13 @@ public final class EntitySpawner {
         this.startingBallSpawnY = startingBallSpawnY;
     }
 
-    private void handlePlayerInput(IntSet keysPressed, LinearVelocity velocity, float multiplier) {
+    private void handlePlayerInput(IntSet keysPressed, LinearVelocity velocity) {
         var leftPressed = keysPressed.contains(Input.Keys.LEFT);
         var rightPressed = keysPressed.contains(Input.Keys.RIGHT);
         if (leftPressed == rightPressed) {
             velocity.x = 0;
         } else {
             velocity.x = leftPressed ? -paddleVelocity : paddleVelocity;
-            velocity.x *= multiplier;
         }
     }
 
@@ -76,7 +78,7 @@ public final class EntitySpawner {
         velocity.y = ballVelocity * MathUtils.sin(angle);
     }
 
-    public void spawnBall(float x, float y, float xVel, float yVel) {
+    public void spawnDroppingBall(float x, float y) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
         var velocity = world.edit(entityId).create(LinearVelocity.class);
@@ -88,9 +90,14 @@ public final class EntitySpawner {
         position.previous.set(position.current);
         size.set(ballSize, ballSize);
         sprite.texture = assets.getBallTexture();
-        collider.bounce = true;
-        collider.playImpactSound = true;
-        launchBall(velocity);
+        collider.ghosted = true;
+        collider.bounce = false;
+        collider.playImpactSound = false;
+
+        velocity.x = 0;
+        velocity.y = -ballSpawnVelocity;
+
+        //launchBall(velocity);
     }
 
     public void spawnStartingBall(int paddleId) {
@@ -128,7 +135,7 @@ public final class EntitySpawner {
             @Override
             public boolean keyDown(int keycode) {
                 keysPressed.add(keycode);
-                handlePlayerInput(keysPressed, velocity, 1f);
+                handlePlayerInput(keysPressed, velocity);
 
                 // Launch the ball.
                 if (keycode == Input.Keys.SPACE) {
@@ -145,6 +152,7 @@ public final class EntitySpawner {
 
                     // Make the ball a collider that bounces.
                     var collider = world.edit(entityId).create(Collider.class);
+                    collider.ghosted = false;
                     collider.bounce = true;
                     collider.playImpactSound = true;
                 }
@@ -157,7 +165,7 @@ public final class EntitySpawner {
                 // If key hasn't been pressed yet, we don't want to affect the velocity.
                 if (!keysPressed.contains(keycode)) return false;
                 keysPressed.remove(keycode);
-                handlePlayerInput(keysPressed, velocity, 1f);
+                handlePlayerInput(keysPressed, velocity);
                 return false;
             }
         };
@@ -184,6 +192,7 @@ public final class EntitySpawner {
         size.set(paddleWidth, paddleHeight);
         sprite.texture = assets.getPaddleTexture();
 
+        collider.ghosted = true;
         collider.bounce = false;
         collider.playImpactSound = false;
 
@@ -200,7 +209,7 @@ public final class EntitySpawner {
             @Override
             public boolean keyDown(int keycode) {
                 keysPressed.add(keycode);
-                handlePlayerInput(keysPressed, velocity, PASSES);
+                handlePlayerInput(keysPressed, velocity);
                 return false;
             }
 
@@ -209,7 +218,7 @@ public final class EntitySpawner {
                 // If key hasn't been pressed yet, we don't want to affect the velocity.
                 if (!keysPressed.contains(keycode)) return false;
                 keysPressed.remove(keycode);
-                handlePlayerInput(keysPressed, velocity, PASSES);
+                handlePlayerInput(keysPressed, velocity);
                 return false;
             }
         };
@@ -273,6 +282,12 @@ public final class EntitySpawner {
             if (hitpoints.value > 0 && timeSinceLastHit > 0.1f) {
                 hitpoints.value -= 1;
                 impactSound.lastPlayedTime = currentTime;
+
+                // Spawn a dropping ball at a percent change.
+                spawnDroppingBall(
+                    MathUtils.random(position.current.x, position.current.x + size.width),
+                    MathUtils.random(position.current.y, position.current.y + size.height)
+                );
 
                 if (startHitpoints > 3) {
                     // Remaining hp as a percentage, from 0f to 1f;

@@ -37,6 +37,7 @@ public interface ScreenComponent {
             @BindsInstance @Named("brickSize") float brickSize,
             @BindsInstance @Named("ballSize") float ballSize,
             @BindsInstance @Named("ballVelocity") float ballVelocity,
+            @BindsInstance @Named("ballSpawnVelocity") float ballSpawnVelocity,
             @BindsInstance @Named("startingBallSpawnX") float startingBallSpawnX,
             @BindsInstance @Named("startingBallSpawnY") float startingBallSpawnY,
             @BindsInstance @Named("paddleWidth") float paddleWidth,
