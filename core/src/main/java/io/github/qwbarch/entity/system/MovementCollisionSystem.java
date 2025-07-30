@@ -152,36 +152,36 @@ public final class MovementCollisionSystem extends LogicSystem {
                 ) {
                     // Collided into the left of the entity.
                     if (previousRight <= collidableLeft) {
-                        position.current.x = collidableLeft - size.width;
-
-                        if (collider.bounce) velocity.reverseX();
-                        else velocity.setZero();
-
+                        if (!collider.ghosted) {
+                            position.current.x = collidableLeft - size.width;
+                            if (collider.bounce) velocity.reverseX();
+                            else velocity.setZero();
+                        }
                         handleCollision(entityId, collidableId);
                     }
                     // Collided into the right of the entity.
                     else if (previousLeft >= collidableRight) {
-                        position.current.x = collidableRight;
-
-                        if (collider.bounce) velocity.reverseX();
-                        else velocity.setZero();
-
+                        if (!collider.ghosted) {
+                            position.current.x = collidableRight;
+                            if (collider.bounce) velocity.reverseX();
+                            else velocity.setZero();
+                        }
                         handleCollision(entityId, collidableId);
                     }
                     // Collided into the bottom of the entity.
                     else if (previousTop <= collidableBottom) {
-                        position.current.y = collidableBottom - size.height;
-
-                        if (collider.bounce) velocity.reverseY();
-                        else velocity.setZero();
-
+                        if (!collider.ghosted) {
+                            position.current.y = collidableBottom - size.height;
+                            if (collider.bounce) velocity.reverseY();
+                            else velocity.setZero();
+                        }
                         handleCollision(entityId, collidableId);
                     } else if (previousBottom >= collidableTop) {
-                        position.current.y = collidableTop;
-
-                        if (collider.bounce) velocity.reverseY();
-                        else velocity.setZero();
-
+                        if (!collider.ghosted) {
+                            position.current.y = collidableTop;
+                            if (collider.bounce) velocity.reverseY();
+                            else velocity.setZero();
+                        }
                         handleCollision(entityId, collidableId);
                     }
                 }
@@ -198,7 +198,7 @@ public final class MovementCollisionSystem extends LogicSystem {
             var impactSound = impactSounds.get(collidableId);
             var currentTime = System.nanoTime();
             var timeSinceLastPlayed = (currentTime - impactSound.lastPlayedTime) / 1_000_000_000f;
-            if (impactSound.sound != null && timeSinceLastPlayed > 0.1f)  {
+            if (impactSound.sound != null && timeSinceLastPlayed > 0.1f) {
                 impactSound.lastPlayedTime = currentTime;
                 impactSound.sound.play();
             }

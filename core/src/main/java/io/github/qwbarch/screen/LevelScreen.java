@@ -82,10 +82,8 @@ public abstract class LevelScreen implements Screen {
             borderSize,
             worldHeight
         );
-        var paddleId = spawner.spawnPaddle();
-
-
-        spawner.spawnStartingBall(paddleId);
+        spawner.spawnPaddle();
+        spawner.spawnStartingBall();
 
         // Center the camera.
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);

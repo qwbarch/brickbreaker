@@ -11,8 +11,6 @@ import io.github.qwbarch.entity.component.*;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static io.github.qwbarch.entity.system.MovementCollisionSystem.PASSES;
-
 public final class EntitySpawner {
     private final World world;
     private final AssetMap assets;
@@ -27,6 +25,7 @@ public final class EntitySpawner {
     private final float paddleSpawnY;
     private final float paddleWidth;
     private final float paddleHeight;
+    private int paddleId = -1;
 
     @Inject
     EntitySpawner(
@@ -85,6 +84,7 @@ public final class EntitySpawner {
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
         var collider = world.edit(entityId).create(Collider.class);
+        var collisionListener = world.edit(entityId).create(CollisionListener.class);
 
         position.current.set(x, y);
         position.previous.set(position.current);
@@ -97,10 +97,23 @@ public final class EntitySpawner {
         velocity.x = 0;
         velocity.y = -ballSpawnVelocity;
 
-        //launchBall(velocity);
+        assets.getBallSpawnSound().play();
+
+        collisionListener.listener = (var colliderId, var collidableId) -> {
+            if (collidableId == paddleId) {
+                collider.ghosted = false;
+                collider.bounce = true;
+                collider.playImpactSound = true;
+                launchBall(velocity);
+                var paddlePosition = world.getMapper(Position.class).get(paddleId);
+                position.current.y = paddlePosition.current.y + size.height;
+            }
+        };
     }
 
-    public void spawnStartingBall(int paddleId) {
+    public void spawnStartingBall() {
+        if (paddleId < 0) throw new RuntimeException("Paddle has not been initialized yet.");
+
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
         var velocity = world.edit(entityId).create(LinearVelocity.class);
@@ -173,6 +186,7 @@ public final class EntitySpawner {
 
     public int spawnPaddle() {
         var entityId = world.create();
+        paddleId = entityId;
         var position = world.edit(entityId).create(Position.class);
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
@@ -192,7 +206,7 @@ public final class EntitySpawner {
         size.set(paddleWidth, paddleHeight);
         sprite.texture = assets.getPaddleTexture();
 
-        collider.ghosted = true;
+        collider.ghosted = false;
         collider.bounce = false;
         collider.playImpactSound = false;
 
