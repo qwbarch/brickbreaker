@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
 
 import javax.inject.Inject;
@@ -19,6 +20,8 @@ public final class MenuScreen implements Screen {
     private final Stage stage = new Stage(new ScreenViewport());
     private Skin skin;
 
+    private final ScreenHandler screenHandler;
+    private final Screen instructionScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final GlyphLayout glyphLayout;
@@ -39,6 +42,8 @@ public final class MenuScreen implements Screen {
 
     @Inject
     MenuScreen(
+        ScreenHandler screenHandler,
+        InstructionScreen instructionScreen,
         AssetMap assets,
         SpriteBatch batch,
         GlyphLayout glyphLayout,
@@ -47,6 +52,8 @@ public final class MenuScreen implements Screen {
         @Named("logo") String logo
     ) {
         System.out.println("MenuScreen constructor");
+        this.screenHandler = screenHandler;
+        this.instructionScreen = instructionScreen;
         this.assets = assets;
         this.batch = batch;
         this.glyphLayout = glyphLayout;
@@ -58,8 +65,9 @@ public final class MenuScreen implements Screen {
     private void initMenuButtons() {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
+        var hoverSound = assets.getButtonHoverSound();
 
-        var selectLevelButton = new TextButton("Select Level", skin);
+        var selectLevelButton = new MenuButton("Select Level", skin, assets);
         selectLevelButton.setPosition(
             screenWidth/ 2f - selectLevelButton.getWidth() / 2f,
             screenHeight - logoHeight * 7f
@@ -70,7 +78,7 @@ public final class MenuScreen implements Screen {
             }
         });
 
-        var howToPlayButton = new TextButton("How To Play", skin);
+        var howToPlayButton = new MenuButton("How To Play", skin, assets);
         howToPlayButton.setPosition(
             screenWidth/ 2f - howToPlayButton.getWidth() / 2f,
             screenHeight - logoHeight * 8f
@@ -78,10 +86,11 @@ public final class MenuScreen implements Screen {
         howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                screenHandler.setScreen(instructionScreen);
             }
         });
 
-        var quitButton = new TextButton("Quit Game", skin);
+        var quitButton = new MenuButton("Quit Game", skin, assets);
         quitButton.setPosition(
             screenWidth/ 2f - quitButton.getWidth() / 2f,
             screenHeight - logoHeight * 9f

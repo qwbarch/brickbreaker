@@ -29,6 +29,9 @@ public final class AssetMap {
     private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
     private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
 
+    private static final String BUTTON_HOVER_SOUND_PATH = "button-hover.mp3";
+    private static final String BUTTON_CLICK_SOUND_PATH = "button-click.mp3";
+
     private static final String MAIN_FONT_PATH = "Blanka-Regular.otf";
 
     private final AssetManager assetManager = new AssetManager();
@@ -64,6 +67,8 @@ public final class AssetMap {
             assetManager.load(BACKGROUND_MUSIC_PATH, Sound.class);
             assetManager.load(BALL_SPAWN_SOUND_PATH, Sound.class);
             assetManager.load(HARD_BOUNCE_SOUND_PATH, Sound.class);
+            assetManager.load(BUTTON_HOVER_SOUND_PATH, Sound.class);
+            assetManager.load(BUTTON_CLICK_SOUND_PATH, Sound.class);
         }
     }
 
@@ -135,5 +140,13 @@ public final class AssetMap {
 
     public Sound getHardBounceSound() {
         return assetManager.get(HARD_BOUNCE_SOUND_PATH, Sound.class);
+    }
+
+    public Sound getButtonHoverSound() {
+        return assetManager.get(BUTTON_HOVER_SOUND_PATH, Sound.class);
+    }
+
+    public Sound getButtonClickSound() {
+        return assetManager.get(BUTTON_CLICK_SOUND_PATH, Sound.class);
     }
 }

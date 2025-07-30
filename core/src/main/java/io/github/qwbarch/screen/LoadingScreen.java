@@ -16,8 +16,8 @@ public final class LoadingScreen implements Screen {
 
     private final SpriteBatch batch;
     private final ScreenHandler screenHandler;
-    private final MenuScreen menuScreen;
-    private final LevelScreen levelScreen;
+    private final Screen menuScreen;
+    private final Screen levelScreen;
     private final AssetMap assets;
     private final BitmapFont font;
     private final String leftLogo;
