@@ -2,7 +2,6 @@ package io.github.qwbarch.screen;
 
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.holidaystudios.tools.GifDecoder;
 import io.github.qwbarch.asset.AssetMap;
@@ -13,10 +12,6 @@ import javax.inject.Named;
 
 @ScreenScope
 public final class LoadingScreen implements Screen {
-    private static final String LEFT_LOGO = "Brick";
-    private static final String RIGHT_LOGO = "Breaker";
-    private static final String LOGO = LEFT_LOGO + " " + RIGHT_LOGO;
-
     private final Animation<TextureRegion> loadingAnimation;
 
     private final SpriteBatch batch;
@@ -24,12 +19,11 @@ public final class LoadingScreen implements Screen {
     private final MenuScreen menuScreen;
     private final LevelScreen levelScreen;
     private final AssetMap assets;
-    private final BitmapFont logoFont;
+    private final BitmapFont font;
+    private final String leftLogo;
+    private final String rightLogo;
 
-    private final float leftLogoWidth;
-    private final float leftLogoHeight;
     private final float rightLogoWidth;
-    private final float rightLogoHeight;
     private final float logoWidth;
     private final float logoHeight;
 
@@ -39,18 +33,24 @@ public final class LoadingScreen implements Screen {
     @Inject
     LoadingScreen(
         ScreenHandler screenHandler,
+        GlyphLayout glyphLayout,
         MenuScreen menuScreen,
         LevelScreen levelScreen,
         AssetMap assets,
         World world,
         SpriteBatch batch,
-        @Named("logoFontSize") int logoFontSize
+        @Named("logoFontSize") int logoFontSize,
+        @Named("leftLogo") String leftLogo,
+        @Named("rightLogo") String rightLogo,
+        @Named("logo") String logo
     ) {
         this.batch = batch;
         this.screenHandler = screenHandler;
         this.menuScreen = menuScreen;
         this.levelScreen = levelScreen;
         this.assets = assets;
+        this.leftLogo = leftLogo;
+        this.rightLogo = rightLogo;
 
         // Load the loading animation blocking the thread, since we need it immediately.
         loadingAnimation = GifDecoder.loadGIFAnimation(
@@ -58,23 +58,16 @@ public final class LoadingScreen implements Screen {
             Gdx.files.internal("loading.gif").read()
         );
 
-        logoFont = assets.loadLogoFont();
-        var layout = new GlyphLayout();
-
-        // Calculate dimensions of the left side of the logo.
-        layout.setText(logoFont, LEFT_LOGO);
-        leftLogoWidth = layout.width;
-        leftLogoHeight = layout.height;
+        font = assets.loadMainFont();
 
         // Calculate dimensions of the right side of the logo.
-        layout.setText(logoFont, RIGHT_LOGO);
-        rightLogoWidth = layout.width;
-        rightLogoHeight = layout.height;
+        glyphLayout.setText(font, rightLogo);
+        rightLogoWidth = glyphLayout.width;
 
         // Calculate dimensions of the combined logo.
-        layout.setText(logoFont, LOGO);
-        logoWidth = layout.width;
-        logoHeight = layout.height;
+        glyphLayout.setText(font, logo);
+        logoWidth = glyphLayout.width;
+        logoHeight = glyphLayout.height;
     }
 
     @Override
@@ -96,22 +89,21 @@ public final class LoadingScreen implements Screen {
         );
 
         // Draw the left logo.
-        logoFont.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
+        font.setColor(212f / 255f, 83f / 255f, 83f / 255f, 1f);
         var leftLogoX = screenWidth / 2f - logoWidth / 2f;
         var logoY = screenHeight / 3f * 2f + logoHeight / 2f;
-        logoFont.draw(batch, "Brick", leftLogoX, logoY);
+        font.draw(batch, leftLogo, leftLogoX, logoY);
 
         // Draw the right logo.
-        logoFont.setColor(1f, 1f, 1f, 1f);
-        logoFont.draw(
+        font.setColor(1f, 1f, 1f, 1f);
+        font.draw(
             batch,
-            "Breaker",
+            rightLogo,
             leftLogoX + logoWidth - rightLogoWidth,
             logoY
         );
 
         batch.end();
-
 
         if (firstFrame) {
             firstFrame = false;
@@ -119,7 +111,7 @@ public final class LoadingScreen implements Screen {
         } else {
             assets.update();
             if (assets.isFinishedLoading()) {
-                //screenHandler.setScreen(levelScreen);
+                screenHandler.setScreen(menuScreen);
             }
         }
     }

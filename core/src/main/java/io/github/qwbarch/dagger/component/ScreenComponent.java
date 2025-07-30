@@ -2,6 +2,7 @@ package io.github.qwbarch.dagger.component;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import dagger.Binds;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.Subcomponent;
@@ -40,7 +41,10 @@ public interface ScreenComponent {
             @BindsInstance @Named("paddleVelocity") float paddleVelocity,
             @BindsInstance @Named("paddleSpawnX") float paddleSpawnX,
             @BindsInstance @Named("paddleSpawnY") float paddleSpawnY,
-            @BindsInstance @Named("logoFontSize") int logoFontSize
+            @BindsInstance @Named("logoFontSize") int logoFontSize,
+            @BindsInstance @Named("leftLogo") String leftLogo,
+            @BindsInstance @Named("rightLogo") String rightLogo,
+            @BindsInstance @Named("logo") String logo
         );
     }
 }

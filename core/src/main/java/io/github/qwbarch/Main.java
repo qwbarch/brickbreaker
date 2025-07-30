@@ -90,6 +90,21 @@ public class Main implements ApplicationListener {
      */
     private final static int LOGO_FONT_SIZE = 80;
 
+    /**
+     * The left part of the logo.
+     */
+    private static final String LEFT_LOGO = "Brick";
+
+    /**
+     * The right part of the logo.
+     */
+    private static final String RIGHT_LOGO = "Breaker";
+
+    /**
+     * The full logo.
+     */
+    private static final String LOGO = LEFT_LOGO + " " + RIGHT_LOGO;
+
     private ScreenHandler screenHandler;
 
     @Override
@@ -115,7 +130,10 @@ public class Main implements ApplicationListener {
                         PADDLE_VELOCITY,
                         PADDLE_SPAWN_X,
                         PADDLE_SPAWN_Y,
-                        LOGO_FONT_SIZE
+                        LOGO_FONT_SIZE,
+                        LEFT_LOGO,
+                        RIGHT_LOGO,
+                        LOGO
                     );
         screenHandler = screenComponent.getScreenHandler();
 

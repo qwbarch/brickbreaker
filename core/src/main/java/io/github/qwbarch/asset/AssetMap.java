@@ -28,7 +28,7 @@ public final class AssetMap {
     private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
     private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
 
-    private static final String LOGO_FONT_PATH = "Blanka-Regular.otf";
+    private static final String MAIN_FONT_PATH = "Blanka-Regular.otf";
 
     private final AssetManager assetManager = new AssetManager();
     private final int logoFontSize;
@@ -79,23 +79,19 @@ public final class AssetMap {
     }
 
     /**
-     * Load the font used for the logo. This blocks the thread and waits for the file to load.
+     * Load the main font used for the logo and menu buttons. This blocks the thread and waits for the file to load.
      */
-    public BitmapFont loadLogoFont() {
+    public BitmapFont loadMainFont() {
         var params = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
-        params.fontFileName = LOGO_FONT_PATH;
+        params.fontFileName = MAIN_FONT_PATH;
         params.fontParameters.size = logoFontSize;
-        assetManager.load(LOGO_FONT_PATH, BitmapFont.class, params);
-        assetManager.finishLoadingAsset(LOGO_FONT_PATH);
-        return assetManager.get(LOGO_FONT_PATH, BitmapFont.class);
+        assetManager.load(MAIN_FONT_PATH, BitmapFont.class, params);
+        assetManager.finishLoadingAsset(MAIN_FONT_PATH);
+        return getMainFont();
     }
 
-    /**
-     * The progress of the asset loading.
-     * @return A number from 0f to 1f.
-     */
-    public float getProgress() {
-        return assetManager.getProgress();
+    public BitmapFont getMainFont() {
+        return assetManager.get(MAIN_FONT_PATH, BitmapFont.class);
     }
 
     public boolean isFinishedLoading() {
