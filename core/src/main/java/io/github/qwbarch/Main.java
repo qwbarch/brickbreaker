@@ -78,7 +78,7 @@ public class Main implements ApplicationListener {
     /**
      * The ball's spawning y-coordinate using in-game units.
      */
-    private final static float STARTING_BALL_SPAWN_Y = PADDLE_SPAWN_Y + BALL_SIZE + 2f;
+    private final static float STARTING_BALL_SPAWN_Y = PADDLE_SPAWN_Y + BALL_SIZE + 1.1f;
 
 
     private ScreenHandler screenHandler;

@@ -1,11 +1,22 @@
 package io.github.qwbarch.entity;
 
 import com.artemis.World;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectMap;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import java.util.HashMap;
+
+import static io.github.qwbarch.entity.system.logic.MovementCollisionSystem.PASSES;
 
 public final class EntitySpawner {
     private final World world;
@@ -14,15 +25,19 @@ public final class EntitySpawner {
     private final float ballSize;
     private final float startingBallSpawnX;
     private final float startingBallSpawnY;
+    private final float paddleVelocity;
     private final float paddleSpawnX;
     private final float paddleSpawnY;
     private final float paddleWidth;
     private final float paddleHeight;
 
+    private float previousVelocity;
+
     @Inject
     EntitySpawner(
         World world,
         AssetMap assets,
+        @Named("paddleVelocity") float paddleVelocity,
         @Named("paddleSpawnX") float paddleSpawnX,
         @Named("paddleSpawnY") float paddleSpawnY,
         @Named("paddleWidth") float paddleWidth,
@@ -36,12 +51,24 @@ public final class EntitySpawner {
         this.assets = assets;
         this.brickSize = brickSize;
         this.ballSize = ballSize;
+        this.paddleVelocity = paddleVelocity;
         this.paddleSpawnX = paddleSpawnX;
         this.paddleSpawnY = paddleSpawnY;
         this.paddleWidth = paddleWidth;
         this.paddleHeight = paddleHeight;
         this.startingBallSpawnX = startingBallSpawnX;
         this.startingBallSpawnY = startingBallSpawnY;
+    }
+
+    private void handlePlayerInput(IntSet keysPressed, LinearVelocity velocity, float multiplier) {
+        var leftPressed = keysPressed.contains(Input.Keys.LEFT);
+        var rightPressed = keysPressed.contains(Input.Keys.RIGHT);
+        if (leftPressed == rightPressed) {
+            velocity.x = 0;
+        } else {
+            velocity.x = leftPressed ? -paddleVelocity : paddleVelocity;
+            velocity.x *= multiplier;
+        }
     }
 
     public void spawnBall(float x, float y, float xVel, float yVel) {
@@ -68,7 +95,7 @@ public final class EntitySpawner {
         var velocity = world.edit(entityId).create(LinearVelocity.class);
         var size = world.edit(entityId).create(Size.class);
         var sprite = world.edit(entityId).create(Sprite.class);
-        world.edit(entityId).create(Player.class);
+        var inputListener = world.edit(entityId).create(InputListener.class);
 
         position.current.x = startingBallSpawnX;
         position.current.y = startingBallSpawnY;
@@ -82,11 +109,34 @@ public final class EntitySpawner {
             var paddlePosition = world.getMapper(Position.class).get(paddleId);
             var paddleSize = world.getMapper(Size.class).get(paddleId);
 
+            if (velocity.x != 0) {
+                previousVelocity = velocity.x;
+            }
             velocity.setZero();
 
             // Center the ball.
             position.current.x = paddlePosition.current.x + paddleSize.width / 2f - ballSize / 2f;
             position.previous.set(position.current);
+        };
+
+        // Move the starting ball left/right using the arrow keys.
+        var keysPressed = new IntSet();
+        inputListener.processor = new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                keysPressed.add(keycode);
+                handlePlayerInput(keysPressed, velocity, 1f);
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                // If key hasn't been pressed yet, we don't want to affect the velocity.
+                if (!keysPressed.contains(keycode)) return false;
+                keysPressed.remove(keycode);
+                handlePlayerInput(keysPressed, velocity, 1f);
+                return false;
+            }
         };
     }
 
@@ -97,13 +147,17 @@ public final class EntitySpawner {
         var sprite = world.edit(entityId).create(Sprite.class);
         var collider = world.edit(entityId).create(Collider.class);
         var impactSound = world.edit(entityId).create(ImpactSound.class);
+        var collisionListener = world.edit(entityId).create(CollisionListener.class);
+        var inputListener = world.edit(entityId).create(InputListener.class);
+        var velocity = world.edit(entityId).create(LinearVelocity.class);
+
         world.edit(entityId).create(Collidable.class);
-        world.edit(entityId).create(LinearVelocity.class);
-        world.edit(entityId).create(Player.class);
 
         position.current.x = paddleSpawnX;
         position.current.y = paddleSpawnY;
         position.previous.set(position.current);
+
+        velocity.setZero();
 
         size.set(paddleWidth, paddleHeight);
         sprite.texture = assets.getPaddleTexture();
@@ -113,6 +167,29 @@ public final class EntitySpawner {
 
         impactSound.sound = assets.getHardBounceSound();
         impactSound.lastPlayedTime = 0f;
+
+        // Move the paddle left and right using the arrow keys.
+        // Its velocity is multiplied by "PASSES" as a workaround for a bug with
+        // MovementCollisionSystem, where collidable entities move slower by a factor
+        // of "PASSES."
+        var keysPressed = new IntSet();
+        inputListener.processor = new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                keysPressed.add(keycode);
+                handlePlayerInput(keysPressed, velocity, PASSES);
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                // If key hasn't been pressed yet, we don't want to affect the velocity.
+                if (!keysPressed.contains(keycode)) return false;
+                keysPressed.remove(keycode);
+                handlePlayerInput(keysPressed, velocity, PASSES);
+                return false;
+            }
+        };
 
         return entityId;
     }
