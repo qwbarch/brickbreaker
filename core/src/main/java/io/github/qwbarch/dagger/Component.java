@@ -10,6 +10,9 @@ import io.github.qwbarch.screen.ScreenHandler;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * The access-point of the dagger dependency graph.
+ */
 @dagger.Component(modules = {Module.class})
 @Singleton
 public interface Component {
@@ -21,6 +24,7 @@ public interface Component {
 
     InputMultiplexer getInputMultiplexer();
 
+    // Dependencies needed for dagger to inject into class constructors.
     @dagger.Component.Factory
     interface Factory {
         Component create(

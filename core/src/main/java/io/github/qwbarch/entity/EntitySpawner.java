@@ -13,11 +13,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * Spawns entities.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class EntitySpawner {
+    // Dependencies injected via dagger.
     private final World world;
     private final AssetMap assets;
-    private final GameOverSystem playerHealthSystem;
     private final float brickSize;
     private final float ballSize;
     private final float ballVelocity;
@@ -30,8 +34,13 @@ public final class EntitySpawner {
     private final float paddleWidth;
     private final float paddleHeight;
     private final float spawnBallChance;
+
+    /**
+     * The player paddle's entity id.
+     */
     private int paddleId = -1;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     EntitySpawner(
         World world,
@@ -52,7 +61,6 @@ public final class EntitySpawner {
     ) {
         this.world = world;
         this.assets = assets;
-        this.playerHealthSystem = playerHealthSystem;
         this.brickSize = brickSize;
         this.ballSize = ballSize;
         this.ballVelocity = ballVelocity;
@@ -67,6 +75,11 @@ public final class EntitySpawner {
         this.spawnBallChance = spawnBallChance;
     }
 
+    /**
+     * Handles the player's input by reacting to the left/right arrow keys.
+     * @param keysPressed All keys pressed.
+     * @param velocity The linear velocity object to modify.
+     */
     private void handlePlayerInput(IntSet keysPressed, LinearVelocity velocity) {
         var leftPressed = keysPressed.contains(Input.Keys.LEFT);
         var rightPressed = keysPressed.contains(Input.Keys.RIGHT);
@@ -77,6 +90,10 @@ public final class EntitySpawner {
         }
     }
 
+    /**
+     * Launch the ball in the range of an upwards cone.
+     * @param velocity The linear velocity object to modify.
+     */
     private void launchBall(LinearVelocity velocity) {
         var angle = MathUtils.random(
             (float) Math.toRadians(10),
@@ -86,6 +103,13 @@ public final class EntitySpawner {
         velocity.y = ballVelocity * MathUtils.sin(angle);
     }
 
+    /**
+     * Spawn a "power-up" ball that falls towards the ground.
+     * The ball falls through all entities unless it collides with the player paddle,
+     * which then becomes a "regular" ball that bounces around.
+     * <p />
+     * These balls count towards keeping the player alive.
+     */
     public void spawnDroppingBall(float x, float y) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
@@ -111,21 +135,31 @@ public final class EntitySpawner {
         assets.getBallSpawnSound().play();
 
         collisionListener.listener = (var colliderId, var collidableId) -> {
+            // If the ball collided with the paddle.
             if (collidableId == paddleId) {
+                // Make the ball able to collide with other entities.
                 collider.ghosted = false;
                 collider.bounce = true;
                 collider.playImpactSound = true;
+
+                // Launch the ball in an upwards direction.
                 launchBall(velocity);
+
+                // Force move the ball above the paddle to prevent it from getting
+                // stuck inside the paddle.
                 var paddlePosition = world.getMapper(Position.class).get(paddleId);
                 position.current.y = paddlePosition.current.y + size.height;
             }
         };
     }
 
+    /**
+     * Spawn the initial ball at the start of the game.
+     * This ball "sticks" to the player paddle until the space button is pressed, which launches it.
+     */
     public void spawnStartingBall() {
+        // The starting ball can only be spawned after the paddle has been spawned.
         if (paddleId < 0) throw new RuntimeException("Paddle has not been initialized yet.");
-
-        System.out.println("spawned starting balll");
 
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
@@ -149,6 +183,8 @@ public final class EntitySpawner {
             var paddlePosition = world.getMapper(Position.class).get(paddleId);
             var paddleSize = world.getMapper(Size.class).get(paddleId);
 
+            // We don't want the ball to continue moving if the paddle is unable to move due to a
+            // world border or other collidable entity.
             velocity.setZero();
 
             // Center the ball.
@@ -163,7 +199,6 @@ public final class EntitySpawner {
             public boolean keyDown(int keycode) {
                 keysPressed.add(keycode);
                 handlePlayerInput(keysPressed, velocity);
-                System.out.println("key pressed");
 
                 // Launch the ball.
                 if (keycode == Input.Keys.SPACE) {
@@ -198,7 +233,10 @@ public final class EntitySpawner {
         };
     }
 
-    public int spawnPaddle() {
+    /**
+     * Spawn the player paddle, which can be controlled using the left/right arrow keys.
+     */
+    public void spawnPaddle() {
         var entityId = world.create();
         paddleId = entityId;
         var position = world.edit(entityId).create(Position.class);
@@ -249,10 +287,11 @@ public final class EntitySpawner {
                 return false;
             }
         };
-
-        return entityId;
     }
 
+    /**
+     * Spawns an invisible border that cannot be collided through.
+     */
     public void spawnInvisibleBorder(float x, float y, float width, float height) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
@@ -268,10 +307,16 @@ public final class EntitySpawner {
         impactSound.lastPlayedTime = 0f;
     }
 
+    /**
+     * Spawns an indestructible grey brick.
+     */
     public void spawnBrick(float x, float y) {
         spawnBrick(x, y, -1);
     }
 
+    /**
+     * Spawns a brick.
+     */
     public void spawnBrick(float x, float y, int startHitpoints) {
         var entityId = world.create();
         var position = world.edit(entityId).create(Position.class);
@@ -310,14 +355,19 @@ public final class EntitySpawner {
 
         hitpoints.value = startHitpoints;
 
+        // Listen for entities that collided into the brick.
         collisionListener.listener = (var colliderId, var brickId) -> {
+            // Only allow the brick to be "hit" on a 0.1f cooldown,
+            // to prevent it from constantly being triggered every render frame if
+            // the ball is still triggering collisions.
             var currentTime = System.nanoTime();
             var timeSinceLastHit = (currentTime - hitpoints.lastHitTime) / 1_000_000_000f;
             if (hitpoints.value > 0 && timeSinceLastHit > 0.1f) {
+                // Remove 1 health point from the brick.
                 hitpoints.value -= 1;
                 impactSound.lastPlayedTime = currentTime;
 
-                // Spawn a dropping ball at a percent change.
+                // Spawn a dropping ball at the specified chance.
                 if (MathUtils.random() < spawnBallChance) {
                     spawnDroppingBall(
                         MathUtils.random(position.current.x, position.current.x + size.width),
@@ -325,19 +375,25 @@ public final class EntitySpawner {
                     );
                 }
 
+                // If the starting hit points is > 3, it will start as a green brick.
                 if (startHitpoints > 3) {
                     // Remaining hp as a percentage, from 0f to 1f;
                     var remainingHitpoints = (float) hitpoints.value / (float) startHitpoints;
                     if (remainingHitpoints > 0.6f) sprite.texture = assets.getGreenBrickTexture();
                     else if (remainingHitpoints > 0.3f) sprite.texture = assets.getYellowBrickTexture();
                     else sprite.texture = assets.getRedBrickTexture();
-                } else if (hitpoints.value == 2) {
+                }
+                // If the starting hit poitns is 2, it will start as a yellow brick.
+                else if (hitpoints.value == 2) {
                     sprite.texture = assets.getYellowBrickTexture();
-                } else if (hitpoints.value == 1) {
+                }
+                // If the starting hit poitns is 1, it will start as a red brick.
+                else if (hitpoints.value == 1) {
                     sprite.texture = assets.getRedBrickTexture();
                 }
             }
 
+            // The brick is fully destroyed. Delete the entity.
             if (hitpoints.value == 0) {
                 world.delete(brickId);
             }

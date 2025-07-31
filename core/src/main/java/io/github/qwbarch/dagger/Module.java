@@ -11,11 +11,15 @@ import io.github.qwbarch.entity.system.*;
 
 import javax.inject.Singleton;
 
+/**
+ * Provides class instances that dagger does not
+ * know how to construct (classes that don't have the @Inject annotation).
+ */
 @dagger.Module
 public final class Module {
     /**
      * Provider method for the entity component system world with all its systems enabled.
-     * A new instance is created for every injection site (e.g. new world per screen).
+     * This is a singleton, so one instance is used for the entire game.
      */
     @Provides
     @Singleton
@@ -27,7 +31,6 @@ public final class Module {
         DespawnSystem despawnSystem,
         GameOverSystem gameOverSystem
     ) {
-        System.out.println("provideWorld");
         return new World(
             new WorldConfigurationBuilder()
                 .with(inputSystem)
@@ -40,20 +43,27 @@ public final class Module {
         );
     }
 
+    /**
+     * This is a singleton, so one instance is used for the entire game.
+     */
     @Provides
     @Singleton
     public SpriteBatch provideSpriteBatch() {
-        System.out.println("provideSpriteBatch");
         return new SpriteBatch();
     }
 
+    /**
+     * This is a singleton, so one instance is used for the entire game.
+     */
     @Provides
     @Singleton
     public GlyphLayout provideGlyphLayout() {
-        System.out.println("provideGlyphLayout");
         return new GlyphLayout();
     }
 
+    /**
+     * This is a singleton, so one instance is used for the entire game.
+     */
     @Provides
     @Singleton
     public InputMultiplexer provideInputMultiplexer() {

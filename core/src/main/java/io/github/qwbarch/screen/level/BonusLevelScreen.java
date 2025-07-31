@@ -18,14 +18,24 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * Bonus level. I made this game because I wanted to have a level like this, where
+ * a TON of balls spawn, constantly hitting the bricks.
+ * <p />
+ * This level might be unplayable on low-end pcs, I have not tested this on bad specs yet.
+ * <p />
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public class BonusLevelScreen extends LevelScreen {
     private static final String START_LABEL = "Bonus level\n\nThat's a lot of balls.";
 
+    // Dependencies injected via dagger.
     private final float brickSize;
     private final EntitySpawner spawner;
     private final Lazy<LevelResolver> levelResolver;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     protected BonusLevelScreen(
         World world,
@@ -65,9 +75,11 @@ public class BonusLevelScreen extends LevelScreen {
     public void show() {
         super.show();
 
-        Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.BONUS_LEVEL;
-        System.out.println("bonus level show");
+        // Spawn all the bricks.
 
+        Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.BONUS_LEVEL;
+
+        // Make the bricks tanky since I want lots of balls to spawn.
         var brickHealth = 700;
 
         // Bottom grey strip. This is a bonus "for-fun" round to see lots of particles so

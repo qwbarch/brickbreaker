@@ -6,6 +6,10 @@ import com.badlogic.gdx.utils.ObjectSet;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Manages the currently displayed screen.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public class ScreenHandler implements Disposable {
     /**
@@ -13,9 +17,9 @@ public class ScreenHandler implements Disposable {
      */
     private Screen currentScreen = null;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
-    ScreenHandler() {
-    }
+    ScreenHandler() { }
 
     /**
      * A list of all currently loaded screens.
@@ -62,11 +66,9 @@ public class ScreenHandler implements Disposable {
     public void setScreen(Screen screen) {
         if (!contains(screen)) add(screen);
         if (currentScreen != null) {
-            System.out.println("hide called");
             currentScreen.hide();
         }
         currentScreen = screen;
-        System.out.println("show called");
         currentScreen.show();
     }
 

@@ -18,10 +18,15 @@ import io.github.qwbarch.asset.AssetMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Displays instructions on how to play the game to the user.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class InstructionScreen implements Screen {
     private static final String HEADER = "How To Play";
 
+    // Dependencies injected via dagger.
     private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
     private final Lazy<MenuScreen> menuScreen;
@@ -34,6 +39,7 @@ public final class InstructionScreen implements Screen {
     private float headerWidth;
     private float headerHeight;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     InstructionScreen(
         InputMultiplexer inputMultiplexer,
@@ -43,7 +49,6 @@ public final class InstructionScreen implements Screen {
         AssetMap assets,
         GlyphLayout glyphLayout
     ) {
-        System.out.println("InstructionScreen constructor");
         this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
         this.menuScreen = menuScreen;
@@ -53,6 +58,10 @@ public final class InstructionScreen implements Screen {
         stage = new Stage(new ScreenViewport(), batch);
     }
 
+    /**
+     * Setup the user interface. This needs to be called whenever the
+     * screen resolution changes.
+     */
     private void setupStage() {
         // Re-add all components in the case of a screen resize.
         stage.clear();

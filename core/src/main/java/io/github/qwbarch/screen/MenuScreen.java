@@ -23,33 +23,34 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * The main menu screen.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class MenuScreen implements Screen {
+    // Dependencies injected via dagger.
     private final Lazy<LevelResolver> levelResolver;
     private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
-    private final Screen level1Screen;
-    private final Screen level2Screen;
-    private final LevelScreen bonusLevelScreen;
     private final Screen instructionScreen;
     private final Screen selectLevelScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final GlyphLayout glyphLayout;
     private final Stage stage;
-
     private final String leftLogo;
     private final String rightLogo;
     private final String logo;
-
     private BitmapFont font;
     private float rightLogoWidth;
     private float logoWidth;
     private float logoHeight;
 
-    // Only play the BGM the first time the menu screen is shown.
+    // Only play the background music the first time the menu screen is shown.
     private boolean firstRun = true;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     MenuScreen(
         Lazy<LevelResolver> levelResolver,
@@ -67,13 +68,9 @@ public final class MenuScreen implements Screen {
         @Named("rightLogo") String rightLogo,
         @Named("logo") String logo
     ) {
-        System.out.println("MenuScreen constructor");
         this.levelResolver = levelResolver;
         this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
-        this.level1Screen = level1Screen;
-        this.level2Screen = level2Screen;
-        this.bonusLevelScreen = bonusLevelScreen;
         this.instructionScreen = instructionScreen;
         this.selectLevelScreen = selectLevelScreen;
         this.assets = assets;
@@ -85,6 +82,10 @@ public final class MenuScreen implements Screen {
         stage = new Stage(new ScreenViewport(), batch);
     }
 
+    /**
+     * Setup the user interface. This needs to be called whenever the
+     * screen resolution changes.
+     */
     private void setupStage() {
         // Re-add all components in the case of a screen resize.
         stage.clear();
@@ -98,7 +99,6 @@ public final class MenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("play game pressed");
                 var screen = Objects.requireNonNull(levelResolver.get()).getCurrentSaveLevelScreen();
                 screen.firstRun = true;
                 screenHandler.setScreen(screen);
@@ -158,7 +158,6 @@ public final class MenuScreen implements Screen {
         logoHeight = glyphLayout.height;
 
         setupStage();
-        System.out.println("main menu show");
         inputMultiplexer.addProcessor(0, stage);
 
         if (firstRun) {
@@ -171,7 +170,6 @@ public final class MenuScreen implements Screen {
 
     @Override
     public void hide() {
-        System.out.println("main menu hide");
         inputMultiplexer.removeProcessor(stage);
     }
 

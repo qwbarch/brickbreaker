@@ -9,6 +9,9 @@ import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.dagger.DaggerComponent;
 import io.github.qwbarch.screen.ScreenHandler;
 
+/**
+ * The main entry-point of the game.
+ */
 public class Main implements ApplicationListener {
     /**
      * Main background color used to clear the screen with.
@@ -117,14 +120,27 @@ public class Main implements ApplicationListener {
      */
     private static final int GRID_CELL_SIZE = (int) BRICK_SIZE;
 
+    /**
+     * An FPS logger. Normally it'd be better to display the FPS in-game,
+     * but I didn't have the time to work on such a minor feature, so
+     * I use this to still be able to see what the FPS is.
+     */
     private final FPSLogger fpsLogger = new FPSLogger();
 
+    /**
+     * The screen handler, for displaying the currently selected screen.
+     * The instance is provided via the dagger component.
+     */
     private ScreenHandler screenHandler;
+
+    /**
+     * Holds all our game assets. This is disposed of when the window is closed.
+     */
     private AssetMap assets;
 
     @Override
     public void create() {
-        // Startup dependency injection.
+        // Dagger creates all of our dependencies and injects the required constructor parameters.
         var component =
                 DaggerComponent
                     .factory()
@@ -152,6 +168,8 @@ public class Main implements ApplicationListener {
                     );
         screenHandler = component.getScreenHandler();
         assets = component.getAssets();
+
+        // Input multiplexer allows multiple input processors to be registered at once.
         Gdx.input.setInputProcessor(component.getInputMultiplexer());
 
         // Start the loading screen.
@@ -160,32 +178,36 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        System.out.println("resize called");
+        // Update the current screen with the latest window dimensions.
         screenHandler.getCurrentScreen().resize(width, height);
     }
 
+    // Render is called as often as possible by LibGDX.
     @Override
     public void render() {
+        // Every second, fps logger will print the current FPS to the console.
         fpsLogger.log();
+
+        // Clear the screen at the start of every frame.
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
+
+        // Render the current screen.
         screenHandler.getCurrentScreen().render();
     }
 
     @Override
     public void pause() {
-        System.out.println("pause called");
         screenHandler.getCurrentScreen().pause();
     }
 
     @Override
     public void resume() {
-        System.out.println("resume called");
         screenHandler.getCurrentScreen().resume();
     }
 
     @Override
     public void dispose() {
-        System.out.println("dispose called");
+        // Release held resources.
         screenHandler.getCurrentScreen().dispose();
         assets.dispose();
     }

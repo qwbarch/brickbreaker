@@ -15,6 +15,10 @@ import com.badlogic.gdx.utils.Disposable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Helper class for asynchronously loading assets and retrieving the assets.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class AssetMap implements Disposable {
     private static final String BALL_TEXTURE_PATH = "ball.png";

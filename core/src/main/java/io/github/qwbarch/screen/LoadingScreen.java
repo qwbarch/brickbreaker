@@ -11,9 +11,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Objects;
 
+/**
+ * The loading (splash) screen.
+ */
 public final class LoadingScreen implements Screen {
-    private final Animation<TextureRegion> loadingAnimation;
-
+    // Dependencies injected via dagger.
     private final Lazy<LevelResolver> levelResolver;
     private final SpriteBatch batch;
     private final ScreenHandler screenHandler;
@@ -23,13 +25,27 @@ public final class LoadingScreen implements Screen {
     private final String leftLogo;
     private final String rightLogo;
 
+    /**
+     * The loading animation's frames.
+     */
+    private final Animation<TextureRegion> loadingAnimation;
+
+    // Dimensions of the logo for render positioning purposes.
     private final float rightLogoWidth;
     private final float logoWidth;
     private final float logoHeight;
 
+    /**
+     * The total elapsed time in seconds.
+     */
     private float elapsedTime;
+
+    /**
+     * For running an effect only on the first frame of the loading screen.
+     */
     private boolean firstFrame = true;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     LoadingScreen(
         Lazy<LevelResolver> levelResolver,
@@ -50,12 +66,13 @@ public final class LoadingScreen implements Screen {
         this.leftLogo = leftLogo;
         this.rightLogo = rightLogo;
 
-        // Load the loading animation blocking the thread, since we need it immediately.
+        // Load the "loading animation" by blocking the main thread, since we need it immediately.
         loadingAnimation = GifDecoder.loadGIFAnimation(
             Animation.PlayMode.LOOP,
             Gdx.files.internal("loading.gif").read()
         );
 
+        // Load the main font by blocking the main thread, since we need it immediately.
         font = assets.loadMainFont();
 
         // Calculate dimensions of the right side of the logo.
@@ -70,6 +87,8 @@ public final class LoadingScreen implements Screen {
 
     @Override
     public void hide() {
+        // Remove the reference to this screen when moving to the main menu,
+        // since we will never see this screen again.
         screenHandler.remove(this);
     }
 
@@ -78,7 +97,9 @@ public final class LoadingScreen implements Screen {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
 
+        // Keep track of the elapsed time in seconds.
         elapsedTime += Gdx.graphics.getDeltaTime();
+
         batch.begin();
 
         // Draw the current loading animation frame.
@@ -108,15 +129,20 @@ public final class LoadingScreen implements Screen {
 
         batch.end();
 
+        // Start asynchronously loading the game's assets on the first frame.
         if (firstFrame) {
             firstFrame = false;
             assets.loadAssets();
-        } else {
+        }
+        // Otherwise wait until the assets are done loading.
+        else {
             assets.update();
             if (assets.isFinishedLoading()) {
+                // Load the current save file.
                 var resolver = Objects.requireNonNull(levelResolver.get());
                 resolver.loadSave();
-                System.out.println("level: " + resolver.currentSave);
+
+                // Switch to the menu screen.
                 screenHandler.setScreen(menuScreen);
             }
         }

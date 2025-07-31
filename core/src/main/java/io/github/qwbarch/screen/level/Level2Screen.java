@@ -18,14 +18,20 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * Level 2. This level is a bit difficult and I don't expect players to beat it too quickly.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public class Level2Screen extends LevelScreen {
     private static final String START_LABEL = "Level 2.\n\nDon't even bother trying.";
 
+    // Dependencies injected via dagger.
     private final EntitySpawner spawner;
     private final float brickSize;
     private final Lazy<LevelResolver> levelResolver;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     Level2Screen(
         World world,
@@ -56,7 +62,6 @@ public class Level2Screen extends LevelScreen {
             screenHandler,
             menuScreen
         );
-        System.out.println("level 1 constructor");
         this.spawner = spawner;
         this.brickSize = brickSize;
         this.levelResolver = levelResolver;
@@ -65,6 +70,8 @@ public class Level2Screen extends LevelScreen {
     @Override
     public void show() {
         super.show();
+
+        // Spawn all the bricks.
 
         Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.LEVEL_2;
 

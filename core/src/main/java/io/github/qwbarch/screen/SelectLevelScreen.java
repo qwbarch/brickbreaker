@@ -25,12 +25,18 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * The screen where the user gets to select a level to play.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class SelectLevelScreen implements Screen {
+    /**
+     * The text label to display on the win screen.
+     */
     private static final String HEADER = "Select a level";
 
-    private final Viewport viewport = new ScreenViewport();
-
+    // Dependencies injected via dagger.
     private final InputMultiplexer inputMultiplexer;
     private final AssetMap assets;
     private final GlyphLayout glyphLayout;
@@ -43,12 +49,40 @@ public final class SelectLevelScreen implements Screen {
     private final Lazy<MenuScreen> menuScreen;
     private final Lazy<LevelResolver> levelResolver;
 
+    /**
+     * For handling the user interface's camera.
+     */
+    private final Viewport viewport = new ScreenViewport();
+
+    /**
+     * The font used for the header label.
+     */
     private BitmapFont headerFont;
+
+    /**
+     * The width of the header label.
+     */
     private float headerWidth;
+
+    /**
+     * The height of the header label.
+     */
     private float headerHeight;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
-    SelectLevelScreen(InputMultiplexer inputMultiplexer, AssetMap assets, GlyphLayout glyphLayout, SpriteBatch batch, ScreenHandler screenHandler, Lazy<Level1Screen> level1Screen, Lazy<Level2Screen> level2Screen, Lazy<BonusLevelScreen> bonusLevelScreen, Lazy<MenuScreen> menuScreen, Lazy<LevelResolver> levelResolver) {
+    SelectLevelScreen(
+        InputMultiplexer inputMultiplexer,
+        AssetMap assets,
+        GlyphLayout glyphLayout,
+        SpriteBatch batch,
+        ScreenHandler screenHandler,
+        Lazy<Level1Screen> level1Screen,
+        Lazy<Level2Screen> level2Screen,
+        Lazy<BonusLevelScreen> bonusLevelScreen,
+        Lazy<MenuScreen> menuScreen,
+        Lazy<LevelResolver> levelResolver
+    ) {
         this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
@@ -62,6 +96,10 @@ public final class SelectLevelScreen implements Screen {
         stage = new Stage(viewport, batch);
     }
 
+    /**
+     * Setup the user interface. This needs to be called whenever the
+     * screen resolution changes.
+     */
     private void setupStage() {
         // Re-add all components in the case of a screen resize.
         stage.clear();

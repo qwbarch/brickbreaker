@@ -2,7 +2,7 @@ package io.github.qwbarch.entity.strategy;
 
 import com.artemis.BaseSystem;
 import com.artemis.SystemInvocationStrategy;
-import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.ArrayMap;
 import io.github.qwbarch.entity.system.LogicSystem;
 import io.github.qwbarch.entity.system.RenderSystem;
 
@@ -10,20 +10,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-// TODO: Use ArrayMap instead.
-
 /**
  * Implements a fixed timestep game loop.
  * <a href="https://gafferongames.com/post/fix_your_timestep/">Fix your timestep by Gaffer On Games</a>
- * <p>
+ * <p/>
  * Why are OrderedMaps used for mapping the systems to their "enabled" flag?
- * <p>
+ * <p/>
  * Firstly, I need o(1) lookup on the keys. According to LibGDX, OrderedMaps rarely degrades to o(n).
  * Secondly, I need quick iteration over the keys and values. Ordered maps are simply much more efficient for
  * the tight iteration cycles that this class performs.
  * Thirdly, LibGDX collections such as OrderedMap pools the iterator object when possible, avoiding unnecessary
  * stress on the garbage collector.
- * <p>
+ * <p/>
  * These maps are set to unordered via a property since I don't actually care about the iteration order
  * of these systems. OrderedMap set to unordered still iterates faster than ObjectMap.
  */
@@ -38,13 +36,13 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
      * Systems that run at a fixed timestep.
      * The mapped values indicates whether the system is enabled or not.
      */
-    private OrderedMap<BaseSystem, Boolean> logicSystems = new OrderedMap<>();
+    private final ArrayMap<BaseSystem, Boolean> logicSystems = new ArrayMap<>();
 
     /**
      * Systems that run as often as possible.
      * The mapped values indicate whether the system is enabled or not.
      */
-    private OrderedMap<BaseSystem, Boolean> defaultSystems = new OrderedMap<>();
+    private final ArrayMap<BaseSystem, Boolean> defaultSystems = new ArrayMap<>();
 
     /**
      * Accumulator used for a fixed time-step implementation.
@@ -61,7 +59,7 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
         this.secondsPerTick = secondsPerTick;
     }
 
-    private OrderedMap<BaseSystem, Boolean> isEnabledForSystem(BaseSystem system) {
+    private ArrayMap<BaseSystem, Boolean> isEnabledForSystem(BaseSystem system) {
         if (system instanceof LogicSystem) return logicSystems;
         else return defaultSystems;
     }
@@ -107,9 +105,8 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
             accumulator -= secondsPerTick;
             for (var i = 0; i < logicSystems.size; i++) {
                 // If the logic system is enabled, process it.
-                var system = logicSystems.orderedKeys().get(i);
-                if (logicSystems.get(system)) {
-                    system.process();
+                if (logicSystems.getValueAt(i)) {
+                    logicSystems.getKeyAt(i).process();
                     updateEntityStates();
                 }
             }
@@ -119,8 +116,8 @@ public final class FixedTimestepInvocationStrategy extends SystemInvocationStrat
     private void processDefaultSystems() {
         for (var i = 0; i < defaultSystems.size; i++) {
             // If the default system is enabled, process it.
-            var system = defaultSystems.orderedKeys().get(i);
-            if (defaultSystems.get(system)) {
+            if (defaultSystems.getValueAt(i)) {
+                var system = defaultSystems.getKeyAt(i);
                 // Update the alpha value if the system is a RenderSystem.
                 if (system instanceof RenderSystem) {
                     ((RenderSystem) system).alpha = accumulator / secondsPerTick;

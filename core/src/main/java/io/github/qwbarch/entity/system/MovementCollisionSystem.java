@@ -11,15 +11,13 @@ import io.github.qwbarch.entity.component.*;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * Handles the movement and collision of entities.<br />
+ * Handles the movement and collision of entities.
  * Why both at once? It was originally separated, but I couldn't figure out how to avoid the tunneling issue
- * without doing multiple passes in a single game tick. <br />
+ * without doing multiple passes in a single game tick.
+ * <p/>
+ * This is a singleton, so one instance is used for the entire game.
  */
 @All({Position.class, LinearVelocity.class, Size.class})
 @Singleton
@@ -35,14 +33,8 @@ public final class MovementCollisionSystem extends LogicSystem {
     private static final int PASSES = 4;
     private static final float SECONDS_PER_PASS = 1f / PASSES;
 
-    /**
-     * Amount of real-world seconds that passes by per game tick.
-     * This is used to make movement a set distance no matter the game's ticks per second.
-     * <br />
-     * Whether the ticks per second is 15 or 60 for example, entities will move the same distance.
-     */
+    // Dependencies injected via dagger.
     private final float secondsPerTick;
-
     private final int gridCellSize;
 
     /**
@@ -82,6 +74,7 @@ public final class MovementCollisionSystem extends LogicSystem {
     private ComponentMapper<CollisionListener> collisionListeners;
     private ComponentMapper<ImpactSound> impactSounds;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     public MovementCollisionSystem(
         @Named("secondsPerTick") float secondsPerTick,
@@ -124,8 +117,8 @@ public final class MovementCollisionSystem extends LogicSystem {
             var maxCellY = (int) Math.floor((position.y + size.height) / gridCellSize);
 
             // Store the collidable entities in their respective cells.
-            for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
-                for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+            for (var cellX = minCellX; cellX <= maxCellX; cellX++) {
+                for (var cellY = minCellY; cellY <= maxCellY; cellY++) {
                     // Store cellX and cellY into a single long key:
                     // https://stackoverflow.com/questions/12772939/java-storing-two-ints-in-a-long
                     var key = (((long) cellX) << 32) | (cellY & 0xffffffffL);
@@ -183,8 +176,8 @@ public final class MovementCollisionSystem extends LogicSystem {
             detectedEntities.clear();
 
             // Check for collisions over overlapping cells.
-            for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
-                for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+            for (var cellX = minCellX; cellX <= maxCellX; cellX++) {
+                for (var cellY = minCellY; cellY <= maxCellY; cellY++) {
                     var key = (((long) cellX) << 32L) | (cellY & 0xffffffffL);
                     var bucket = spatialGrid.get(key);
                     if (bucket == null) continue;
@@ -258,6 +251,11 @@ public final class MovementCollisionSystem extends LogicSystem {
         }
     }
 
+    /**
+     * Handle the collision between the two entities.
+     * @param colliderId The collider entity (entity colliding into the collidable entity).
+     * @param collidableId The collidable entity (entity getting colliding into by the collider entity).
+     */
     private void handleCollision(int colliderId, int collidableId) {
         // Play the impact sound if it isn't currently on cooldown.
         if (colliders.get(colliderId).playImpactSound && impactSounds.has(collidableId)) {

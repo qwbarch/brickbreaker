@@ -1,13 +1,13 @@
 package io.github.qwbarch.lwjgl3;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import io.github.qwbarch.Main;
 
-// TODO: ADD CITATION.
-
-/** Launches the desktop (LWJGL3) application. */
+/**
+ * Launches the game on a desktop platform.
+ * This was included with the LibGDX launcher already.
+ */
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.

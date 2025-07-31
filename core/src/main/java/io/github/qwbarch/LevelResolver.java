@@ -16,27 +16,55 @@ import java.nio.charset.StandardCharsets;
 
 import static io.github.qwbarch.LevelResolver.Level.LEVEL_1;
 
+/**
+ * Handles the logic of level selection and its save file.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class LevelResolver {
+    /**
+     * The save file's file path.
+     */
     private static final String SAVE_FILE_PATH = "save_file.json";
 
+    /**
+     * The available levels the player can play on.
+     */
     public enum Level {
         LEVEL_1,
         LEVEL_2,
         BONUS_LEVEL;
     }
 
-    public record LevelSave(Level level) {
-    }
+    /**
+     * Represent's the player's save file.
+     *
+     * @param level The level of the current save file.
+     */
+    public record LevelSave(Level level) { }
 
+    // Dependencies injected via dagger.
     private final LevelScreen level1Screen;
     private final LevelScreen level2Screen;
     private final LevelScreen bonusLevelScreen;
 
-    private ObjectMapper mapper = new ObjectMapper().registerModule(new ParameterNamesModule());
+    /**
+     * A JSON serializer for converting LevelSave <-> String.
+     */
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new ParameterNamesModule());
+
+    /**
+     * The currently playing level. This is mainly for game retries.
+     */
     public Level currentlyPlaying = LEVEL_1;
+
+    /**
+     * The current save file. Note that if you change this value, you still need to call LevelResolver#saveFile
+     * if you want to actually write it to disk.
+     */
     public LevelSave currentSave = new LevelSave(currentlyPlaying);
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     LevelResolver(
         Level1Screen level1Screen,
@@ -48,15 +76,23 @@ public final class LevelResolver {
         this.bonusLevelScreen = bonusLevelScreen;
     }
 
+    /**
+     * Load the current save file from disk.
+     */
     public void loadSave() {
         var fileHandle = Gdx.files.internal("save_file.json");
         if (fileHandle.exists()) {
+            // Try to read the file and convert it to the LevelSave record.
+            // If it fails it's likely the user messed with the file.
+            // I haven't specifically done extra error handling here because the player
+            // needs to really go out of their way in order for it to error.
             try (var reader = new InputStreamReader(fileHandle.read(), StandardCharsets.UTF_8)) {
                 currentSave = mapper.readValue(reader, LevelSave.class);
             } catch (IOException exception) {
                 throw new RuntimeException(exception);
             }
         } else {
+            // The save file doesn't exist yet. Create the file and save it.
             try {
                 mapper.writeValue(fileHandle.file(), currentSave);
             } catch (IOException exception) {
@@ -67,6 +103,9 @@ public final class LevelResolver {
 
     }
 
+    /**
+     * Get the currently saved level as its Screen object.
+     */
     public LevelScreen getCurrentSaveLevelScreen() {
         return switch (currentSave.level) {
             case LEVEL_1 -> level1Screen;
@@ -75,6 +114,9 @@ public final class LevelResolver {
         };
     }
 
+    /**
+     * Get the currently playing level as its Screen object.
+     */
     public LevelScreen getCurrentlyPlayingLevelScreen() {
         return switch (currentlyPlaying) {
             case LEVEL_1 -> level1Screen;
@@ -84,6 +126,9 @@ public final class LevelResolver {
     }
 
 
+    /**
+     * Save the currentSave into the actual file.
+     */
     public void saveFile() {
         try {
             mapper.writeValue(Gdx.files.internal(SAVE_FILE_PATH).file(), currentSave);

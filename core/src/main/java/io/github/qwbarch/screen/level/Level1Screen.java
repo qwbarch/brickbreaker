@@ -20,15 +20,21 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * Level 1. This level is easy enough to beat but I still expect players to fail a couple of times at first.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class Level1Screen extends LevelScreen {
     private static final String START_LABEL = "Level 1\n\nYou don't know what\nyou're getting into.";
 
+    // Dependencies injected via dagger.
     private final EntitySpawner spawner;
     private final float brickSize;
     private final float worldHeight;
     private final Lazy<LevelResolver> levelResolver;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     Level1Screen(
         World world,
@@ -58,7 +64,6 @@ public final class Level1Screen extends LevelScreen {
             screenHandler,
             menuScreen
         );
-        System.out.println("level 1 constructor");
         this.brickSize = brickSize;
         this.spawner = spawner;
         this.worldHeight = worldHeight;
@@ -69,11 +74,13 @@ public final class Level1Screen extends LevelScreen {
     public void show() {
         super.show();
 
+        // Spawn all the bricks.
+
         Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.LEVEL_1;
 
         var greenBricks = new ObjectSet<Vector2>();
-        greenBricks.addAll(new Vector2[]{
-            // Letter "H"
+        // Letter "H"
+        greenBricks.addAll(
             new Vector2(5, 1),
             new Vector2(5, 2),
             new Vector2(5, 3),
@@ -207,8 +214,7 @@ public final class Level1Screen extends LevelScreen {
             new Vector2(28, 6),
             new Vector2(28, 7),
             new Vector2(28, 9),
-            new Vector2(28, 10)
-        });
+            new Vector2(28, 10));
 
         var currentBrick = new Vector2();
         for (var i = 0; i < 30; i++) {

@@ -20,12 +20,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Objects;
 
+/**
+ * The screen that's displayed when the player loses the level.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @Singleton
 public final class LoseScreen implements Screen {
     private static final String HEADER = "You died. Game over!";
 
-    private final Viewport viewport = new ScreenViewport();
-
+    // Dependencies injected via dagger.
     private final Lazy<LevelResolver> levelResolver;
     private final InputMultiplexer inputMultiplexer;
     private final AssetMap assets;
@@ -34,11 +37,13 @@ public final class LoseScreen implements Screen {
     private final Stage stage;
     private final ScreenHandler screenHandler;
     private final Lazy<MenuScreen> menuScreen;
-
     private BitmapFont headerFont;
     private float headerWidth;
     private float headerHeight;
 
+    private final Viewport viewport = new ScreenViewport();
+
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
     LoseScreen(
         Lazy<LevelResolver> levelResolver,
@@ -59,6 +64,10 @@ public final class LoseScreen implements Screen {
         stage = new Stage(viewport, batch);
     }
 
+    /**
+     * Setup the user interface. This needs to be called whenever the
+     * screen resolution changes.
+     */
     private void setupStage() {
         // Re-add all components in the case of a screen resize.
         stage.clear();

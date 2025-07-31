@@ -9,17 +9,22 @@ import io.github.qwbarch.entity.component.Size;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Handles entities who need to be despawned.
+ * This is a singleton, so one instance is used for the entire game.
+ */
 @All({Position.class, Size.class, Despawnable.class})
 @Singleton
 public class DespawnSystem extends LogicSystem {
+    // Component mappers are automatically injected via artemis-odb,
+    // which gives access to the entity's components.
     private ComponentMapper<Position> positions;
     private ComponentMapper<Size> sizes;
     private ComponentMapper<Despawnable> despawnables;
 
+    // Package-private constructor since dagger injects the dependencies.
     @Inject
-    DespawnSystem() {
-        System.out.println("DespawnSystem constructor");
-    }
+    DespawnSystem() {}
 
     @Override
     protected void process(int entityId) {
