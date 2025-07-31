@@ -59,6 +59,7 @@ public class BonusLevel extends LevelScreen {
     @Override
     public void show() {
         super.show();
+        System.out.println("bonus level show");
 
         var brickHealth = 700;
 

@@ -166,7 +166,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        fpsLogger.log();
+        //fpsLogger.log();
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }

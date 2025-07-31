@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import dagger.Lazy;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.screen.level.BonusLevel;
@@ -152,7 +151,8 @@ public final class MenuScreen implements Screen {
         logoHeight = glyphLayout.height;
 
         setupStage();
-        inputMultiplexer.addProcessor(stage);
+        System.out.println("main menu show");
+        inputMultiplexer.addProcessor(0, stage);
 
         if (firstRun) {
             firstRun = false;
@@ -164,6 +164,7 @@ public final class MenuScreen implements Screen {
 
     @Override
     public void hide() {
+        System.out.println("main menu hide");
         inputMultiplexer.removeProcessor(stage);
     }
 

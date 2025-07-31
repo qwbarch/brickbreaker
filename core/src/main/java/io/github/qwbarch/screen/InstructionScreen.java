@@ -110,7 +110,7 @@ public final class InstructionScreen implements Screen {
         headerHeight = glyphLayout.height;
 
         setupStage();
-        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(0, stage);
     }
 
     @Override

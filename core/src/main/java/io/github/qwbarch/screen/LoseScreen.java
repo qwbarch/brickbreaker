@@ -116,7 +116,7 @@ public final class LoseScreen implements Screen {
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         setupStage();
-        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(0, stage);
     }
 
     @Override
