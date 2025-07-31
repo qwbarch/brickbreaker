@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import dagger.Lazy;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
+import io.github.qwbarch.screen.level.BonusLevel;
 import io.github.qwbarch.screen.level.Level1Screen;
 import io.github.qwbarch.screen.level.Level2Screen;
 
@@ -26,6 +27,7 @@ public final class MenuScreen implements Screen {
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;
     private final Screen level2Screen;
+    private final Screen bonusLevelScreen;
     private final Screen instructionScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
@@ -50,6 +52,7 @@ public final class MenuScreen implements Screen {
         ScreenHandler screenHandler,
         Level1Screen level1Screen,
         Level2Screen level2Screen,
+        BonusLevel bonusLevelScreen,
         InstructionScreen instructionScreen,
         AssetMap assets,
         SpriteBatch batch,
@@ -63,6 +66,7 @@ public final class MenuScreen implements Screen {
         this.screenHandler = screenHandler;
         this.level1Screen = level1Screen;
         this.level2Screen = level2Screen;
+        this.bonusLevelScreen = bonusLevelScreen;
         this.instructionScreen = instructionScreen;
         this.assets = assets;
         this.batch = batch;
@@ -86,7 +90,7 @@ public final class MenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screenHandler.setScreen(level2Screen);
+                screenHandler.setScreen(bonusLevelScreen);
             }
         });
 

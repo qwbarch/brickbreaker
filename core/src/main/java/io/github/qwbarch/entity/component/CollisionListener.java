@@ -16,4 +16,5 @@ public final class CollisionListener extends Component {
     }
 
     public CollisionListenerFunction listener;
+    public float lastCollisionTime;
 }

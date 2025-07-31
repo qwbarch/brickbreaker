@@ -206,12 +206,22 @@ public final class MovementCollisionSystem extends LogicSystem {
 
         // Run the collision listener function.
         if (collisionListeners.has(colliderId)) {
-            var listener = collisionListeners.get(colliderId).listener;
-            if (listener != null) listener.collide(colliderId, collidableId);
+            var collisionListener = collisionListeners.get(colliderId);
+            var currentTime = System.nanoTime();
+            var timeSinceLastPlayed = (currentTime - collisionListener.lastCollisionTime) / 1_000_000_000f;
+            if (collisionListener.listener != null && timeSinceLastPlayed > 0.1f) {
+                collisionListener.lastCollisionTime = currentTime;
+                collisionListener.listener.collide(colliderId, collidableId);
+            }
         }
         if (collisionListeners.has(collidableId)) {
-            var listener = collisionListeners.get(collidableId).listener;
-            if (listener != null) listener.collide(colliderId, collidableId);
+            var collisionListener = collisionListeners.get(collidableId);
+            var currentTime = System.nanoTime();
+            var timeSinceLastPlayed = (currentTime - collisionListener.lastCollisionTime) / 1_000_000_000f;
+            if (collisionListener.listener != null && timeSinceLastPlayed > 0.1f) {
+                collisionListener.lastCollisionTime = currentTime;
+                collisionListener.listener.collide(colliderId, collidableId);
+            }
         }
     }
 }
