@@ -161,7 +161,8 @@ public final class AssetMap implements Disposable {
     }
 
     public Sound getSoftBounceSound() {
-        return assetManager.get(SOFT_BOUNCE_SOUND_PATH, Sound.class);
+        return assetManager.get(BALL_SPAWN_SOUND_PATH, Sound.class);
+        //return assetManager.get(SOFT_BOUNCE_SOUND_PATH, Sound.class);
     }
 
     public Sound getButtonHoverSound() {

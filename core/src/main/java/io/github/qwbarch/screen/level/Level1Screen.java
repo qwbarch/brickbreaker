@@ -1,14 +1,18 @@
 package io.github.qwbarch.screen.level;
 
 import com.artemis.World;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
+import dagger.Lazy;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.EntitySpawner;
 import io.github.qwbarch.screen.LevelScreen;
+import io.github.qwbarch.screen.MenuScreen;
+import io.github.qwbarch.screen.ScreenHandler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,9 +36,24 @@ public final class Level1Screen extends LevelScreen {
         @Named("brickSize") float brickSize,
         @Named("worldBackground") Color worldBackground,
         AssetMap assets,
-        GlyphLayout glyphLayout
+        GlyphLayout glyphLayout,
+        InputMultiplexer inputMultiplexer,
+        ScreenHandler screenHandler,
+        Lazy<MenuScreen> menuScreen
     ) {
-        super(START_LABEL, world, batch, spawner, worldWidth, worldHeight, worldBackground, assets, glyphLayout);
+        super(
+            START_LABEL,
+            world, batch,
+            spawner,
+            worldWidth,
+            worldHeight,
+            worldBackground,
+            assets,
+            glyphLayout,
+            inputMultiplexer,
+            screenHandler,
+            menuScreen
+        );
         System.out.println("level 1 constructor");
         this.brickSize = brickSize;
         this.spawner = spawner;
@@ -44,9 +63,6 @@ public final class Level1Screen extends LevelScreen {
     @Override
     public void show() {
         super.show();
-
-        // 9 right (0  index)
-        // 2 down
 
         var greenBricks = new ObjectSet<Vector2>();
         greenBricks.addAll(new Vector2[]{

@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+// TODO: Use ArrayMap instead.
+
 /**
  * Implements a fixed timestep game loop.
  * <a href="https://gafferongames.com/post/fix_your_timestep/">Fix your timestep by Gaffer On Games</a>
