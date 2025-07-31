@@ -97,6 +97,7 @@ public final class InstructionScreen implements Screen {
         );
 
         stage.addActor(group);
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     @Override

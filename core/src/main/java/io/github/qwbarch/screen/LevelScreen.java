@@ -91,6 +91,8 @@ public abstract class LevelScreen implements Screen {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.ESCAPE) {
+                    if (firstRun) return false;
+
                     isPaused = !isPaused;
                     if (isPaused) {
                         currentViewport = uiViewport;
@@ -130,6 +132,15 @@ public abstract class LevelScreen implements Screen {
             }
         });
 
+        var retryButton = new MenuButton("Retry level", assets);
+        retryButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                hide();
+                show();
+            }
+        });
+
         var mainMenuButton = new MenuButton("Main menu", assets);
         mainMenuButton.addListener(new ClickListener() {
             @Override
@@ -151,6 +162,7 @@ public abstract class LevelScreen implements Screen {
         group.addActor(new Actor()); // Extra space.
         group.addActor(new Actor());
         group.addActor(resumeButton);
+        group.addActor(retryButton);
         group.addActor(mainMenuButton);
         group.addActor(quitButton);
 
@@ -208,6 +220,7 @@ public abstract class LevelScreen implements Screen {
     public void hide() {
         inputMultiplexer.removeProcessor(pauseListener);
         clearWorld();
+        isPaused = false;
     }
 
     @Override
@@ -239,11 +252,11 @@ public abstract class LevelScreen implements Screen {
             );
             batch.end();
         } else {
-            firstRun = false;
             if (isPaused) {
                 pauseStage.act(Gdx.graphics.getDeltaTime());
                 pauseStage.draw();
             } else {
+                firstRun = false;
                 if (currentViewport == uiViewport) {
                     currentViewport = gameViewport;
                     currentViewport.apply();

@@ -27,8 +27,9 @@ public final class MenuScreen implements Screen {
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;
     private final Screen level2Screen;
-    private final Screen bonusLevelScreen;
+    private final LevelScreen bonusLevelScreen;
     private final Screen instructionScreen;
+    private final Screen selectLevelScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
     private final GlyphLayout glyphLayout;
@@ -54,6 +55,7 @@ public final class MenuScreen implements Screen {
         Level2Screen level2Screen,
         BonusLevel bonusLevelScreen,
         InstructionScreen instructionScreen,
+        SelectLevelScreen selectLevelScreen,
         AssetMap assets,
         SpriteBatch batch,
         GlyphLayout glyphLayout,
@@ -68,6 +70,7 @@ public final class MenuScreen implements Screen {
         this.level2Screen = level2Screen;
         this.bonusLevelScreen = bonusLevelScreen;
         this.instructionScreen = instructionScreen;
+        this.selectLevelScreen = selectLevelScreen;
         this.assets = assets;
         this.batch = batch;
         this.glyphLayout = glyphLayout;
@@ -90,6 +93,8 @@ public final class MenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                System.out.println("play game pressed");
+                bonusLevelScreen.firstRun = true;
                 screenHandler.setScreen(bonusLevelScreen);
             }
         });
@@ -98,6 +103,7 @@ public final class MenuScreen implements Screen {
         selectLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                screenHandler.setScreen(selectLevelScreen);
             }
         });
 
@@ -129,6 +135,7 @@ public final class MenuScreen implements Screen {
         );
 
         stage.addActor(group);
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     @Override

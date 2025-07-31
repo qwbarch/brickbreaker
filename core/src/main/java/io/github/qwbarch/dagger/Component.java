@@ -42,7 +42,8 @@ public interface Component {
             @BindsInstance @Named("leftLogo") String leftLogo,
             @BindsInstance @Named("rightLogo") String rightLogo,
             @BindsInstance @Named("logo") String logo,
-            @BindsInstance @Named("spawnBallChance") float spawnBallChance
+            @BindsInstance @Named("spawnBallChance") float spawnBallChance,
+            @BindsInstance @Named("gridCellSize") int gridCellSize
         );
     }
 }

@@ -50,26 +50,22 @@ public class GameOverSystem extends BaseSystem {
             @Override
             public void inserted(IntBag entities) {
                 remainingHealth += entities.size();
-                System.out.println("+ player health: " + remainingHealth);
             }
 
             @Override
             public void removed(IntBag entities) {
                 remainingHealth -= entities.size();
-                System.out.println("- player health: " + remainingHealth);
             }
         });
         world.getAspectSubscriptionManager().get(Aspect.all(Target.class)).addSubscriptionListener(new EntitySubscription.SubscriptionListener() {
             @Override
             public void inserted(IntBag entities) {
                 remainingTargets += entities.size();
-                System.out.println("+ remaining targets: " + remainingTargets);
             }
 
             @Override
             public void removed(IntBag entities) {
                 remainingTargets -= entities.size();
-                System.out.println("- remaining targets: " + remainingTargets);
             }
         });
     }

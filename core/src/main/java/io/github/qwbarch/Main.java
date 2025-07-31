@@ -112,6 +112,11 @@ public class Main implements ApplicationListener {
      */
     private static final float SPAWN_BALL_CHANCE = 0.3f;
 
+    /**
+     * The cell size of the spatial grid used for collision detection.
+     */
+    private static final int GRID_CELL_SIZE = (int) BRICK_SIZE;
+
     private final FPSLogger fpsLogger = new FPSLogger();
 
     private ScreenHandler screenHandler;
@@ -142,7 +147,8 @@ public class Main implements ApplicationListener {
                         LEFT_LOGO,
                         RIGHT_LOGO,
                         LOGO,
-                        SPAWN_BALL_CHANCE
+                        SPAWN_BALL_CHANCE,
+                        GRID_CELL_SIZE
                     );
         screenHandler = component.getScreenHandler();
         assets = component.getAssets();
@@ -160,7 +166,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        //fpsLogger.log();
+        fpsLogger.log();
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }

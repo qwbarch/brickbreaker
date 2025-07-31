@@ -14,7 +14,9 @@ import io.github.qwbarch.screen.ScreenHandler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public class Level2Screen extends LevelScreen {
     private static final String START_LABEL = "Level 2.\n\nDon't even bother trying.";
 

@@ -14,7 +14,9 @@ import io.github.qwbarch.screen.ScreenHandler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public class BonusLevel extends LevelScreen {
     private static final String START_LABEL = "Bonus level\n\nThat's a lot of balls.";
 
@@ -58,11 +60,17 @@ public class BonusLevel extends LevelScreen {
     public void show() {
         super.show();
 
-        var brickHealth = 200;
+        var brickHealth = 700;
 
-        // Bottom grey strip.
+        // Bottom grey strip. This is a bonus "for-fun" round to see lots of particles so
+        // this is for the player to not lose any balls.
+        for (var i = 0; i < 30; i++) {
+            spawner.spawnBrick(i * brickSize, 0);
+        }
+
+        // Bottom green strip. Tankier since it receives way more hits.
         for (var i = 0; i < 27; i++) {
-            spawner.spawnBrick(26f * brickSize - i * brickSize, 4 * brickSize);
+            spawner.spawnBrick(26f * brickSize - i * brickSize, 4 * brickSize, brickHealth * 2);
         }
 
         for (var i = 0; i < 21; i++) {

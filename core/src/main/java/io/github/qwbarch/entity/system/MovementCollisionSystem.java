@@ -5,11 +5,17 @@ import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
 import com.artemis.utils.IntBag;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles the movement and collision of entities.<br />
@@ -23,7 +29,7 @@ public final class MovementCollisionSystem extends LogicSystem {
      * Entities do multiple movement / collision detection passes
      * in order to avoid the tunneling issue (where entities
      * clip through collidable objects if the entity is moving too fast).
-     * <br />
+     * <p/>
      * The higher # of passes, the less likely tunneling happens.
      * However, the higher # of passes, the higher the cpu usage as well.
      */
@@ -38,6 +44,8 @@ public final class MovementCollisionSystem extends LogicSystem {
      */
     private final float secondsPerTick;
 
+    private final int gridCellSize;
+
     // Component mappers are automatically injected via artemis-odb,
     // which gives access to the entity's components.
     private ComponentMapper<Position> positions;
@@ -48,20 +56,28 @@ public final class MovementCollisionSystem extends LogicSystem {
     private ComponentMapper<CollisionListener> collisionListeners;
     private ComponentMapper<ImpactSound> impactSounds;
 
-    // Allows us to iterate over collidable entities.
+    /**
+     * Used to iterate over all collidable entities.
+     */
     private EntitySubscription collidableSubscription;
-    private IntBag collidableEntities;
+
+    /**
+     * Used for splitting up the world into a grid of cells.
+     * Collision detection is only performed on the closest cells of the collider.
+     */
+    private final ObjectMap<Long, IntBag> spatialGrid = new ObjectMap<>();
 
     @Inject
     public MovementCollisionSystem(
-        @Named("secondsPerTick") float secondsPerTick
+        @Named("secondsPerTick") float secondsPerTick,
+        @Named("gridCellSize") int gridCellSize
     ) {
         this.secondsPerTick = secondsPerTick;
+        this.gridCellSize = gridCellSize;
     }
 
     @Override
     protected void initialize() {
-        // Subscribe to collidable entities to read from later on, for collision detection purposes.
         collidableSubscription =
             world
                 .getAspectSubscriptionManager()
@@ -70,15 +86,37 @@ public final class MovementCollisionSystem extends LogicSystem {
 
     @Override
     protected void begin() {
-        // Begin method is called once every game logic tick.
-        // This updates the collidable entities every tick.
-        collidableEntities = collidableSubscription.getEntities();
+        var collidableEntities = collidableSubscription.getEntities();
+
+        // Re-calculate the available collidable entities for the spatial
+        // grid on every game tick.
+        spatialGrid.clear();
+        for (var i = 0; i < collidableEntities.size(); i++) {
+            int entityId = collidableEntities.get(i);
+            if (!collidables.has(entityId)) continue;
+
+            var position = positions.get(entityId).current;
+            var size = sizes.get(entityId);
+            var minCellX = (int) Math.floor(position.x / gridCellSize);
+            var maxCellX = (int) Math.floor((position.x + size.width) / gridCellSize);
+            var minCellY = (int) Math.floor(position.y / gridCellSize);
+            var maxCellY = (int) Math.floor((position.y + size.height) / gridCellSize);
+
+            // Store the collidable entities in their respective cells.
+            for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
+                for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+                    var key = (((long) cellX) << 32) | (cellY & 0xffffffffL);
+                    var bag = spatialGrid.get(key);
+                    if (bag == null) {
+                        bag = new IntBag();
+                        spatialGrid.put(key, bag);
+                    }
+                    bag.add(entityId);
+                }
+            }
+        }
     }
 
-    /**
-     * Called once per game tick on every entity that matches the specified aspects above
-     * (from the @All, @One, etc. annotations).
-     */
     @Override
     protected void process(int entityId) {
         // Get the components of the current entity to process.
@@ -93,105 +131,113 @@ public final class MovementCollisionSystem extends LogicSystem {
         // have higher fps than the game's tick rate.
         position.previous.set(position.current);
 
-        // Do multiple passes to avoid tunneling issue.
+        // Do multiple passes to avoid the tunneling issue.
         for (var pass = 0; pass < PASSES; pass++) {
-            // Position at the previous game state (before updating position).
             var previousLeft = position.current.x;
             var previousBottom = position.current.y;
             var previousRight = previousLeft + size.width;
             var previousTop = previousBottom + size.height;
 
             // Update the entity's position.
-            //
-            // Since they move extra times due to # of passes, each movement is shorter,
-            // so they eventually move the same distance as if we weren't doing multiple passes.
             position.current.x += velocity.x * secondsPerTick * SECONDS_PER_PASS;
             position.current.y += velocity.y * secondsPerTick * SECONDS_PER_PASS;
 
-            // Only do collision detection if the current entity is a collider,
-            // otherwise only the above movement is applied.
             if (!colliders.has(entityId)) continue;
             var collider = colliders.get(entityId);
 
-            // Position at the current game state (after updating position).
+            // Collider's current position/bounds.
             var currentLeft = position.current.x;
             var currentBottom = position.current.y;
             var currentRight = currentLeft + size.width;
             var currentTop = currentBottom + size.height;
 
-            // Collision detection on every collidable entity.
-            // This is inefficient since it's unnecessarily detecting collisions over entities that aren't even close.
-            //
-            // TODO: Optimize this to only detect collision on nearby entities.
-            // E.g. using a quad tree to process only within one quadrant.
-            for (var i = 0; i < collidableEntities.size(); i++) {
-                var collidableId = collidableEntities.get(i);
+            // Grid cell bounds to check for.
+            var minCellX = (int) Math.floor(currentLeft / gridCellSize);
+            var maxCellX = (int) Math.floor(currentRight / gridCellSize);
+            var minCellY = (int) Math.floor(currentBottom / gridCellSize);
+            var maxCellY = (int) Math.floor(currentTop / gridCellSize);
 
-                if (!collidables.has(collidableId)) continue;
+            // Track tested collidable entities to avoid duplicate tests.
+            var collidableTested = new ObjectSet<>();
 
-                var collidablePosition = positions.get(collidableId);
-                var collidableSize = sizes.get(collidableId);
+            // Check for collisions over overlapping cells.
+            for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
+                for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+                    // Store the two cells as a single long value:
+                    // https://stackoverflow.com/questions/12772939/java-storing-two-ints-in-a-long
+                    var key = (((long) cellX) << 32L) | (cellY & 0xffffffffL);
+                    var bucket = spatialGrid.get(key);
+                    if (bucket == null) continue;
 
-                // Position of the collidable entity.
-                var collidableLeft = collidablePosition.current.x;
-                var collidableBottom = collidablePosition.current.y;
-                var collidableRight = collidableLeft + collidableSize.width;
-                var collidableTop = collidableBottom + collidableSize.height;
+                    for (var i = 0; i < bucket.size(); i++) {
+                        var collidableId = bucket.get(i);
 
-                // Collision detection of entities marked as a BouncySurface.
-                // https://lazyfoo.net/tutorials/SDL/27_collision_detection/index.php
+                        if (!collidableTested.add(collidableId)) continue;
+                        if (!collidables.has(collidableId)) continue;
 
-                // If entity is within collision bounds.
-                // This doesn't necessarily mean a collision has happened,
-                // which requires the below checks to be exact.
-                if (
-                    currentLeft < collidableRight
-                        && currentRight > collidableLeft
-                        && currentBottom < collidableTop
-                        && currentTop > collidableBottom
-                ) {
-                    // Collided into the left of the entity.
-                    if (previousRight <= collidableLeft) {
-                        if (!collider.ghosted) {
-                            position.current.x = collidableLeft - size.width;
-                            if (collider.bounce) velocity.reverseX();
-                            else velocity.setZero();
+                        var collidablePosition = positions.get(collidableId).current;
+                        var collidableSize = sizes.get(collidableId);
+
+                        // Position/bounds of the collidable entity.
+                        var collidableLeft = collidablePosition.x;
+                        var collidableBottom = collidablePosition.y;
+                        var collidableRight = collidableLeft + collidableSize.width;
+                        var collidableTop = collidableBottom + collidableSize.height;
+
+                        // Collision detection of entities.
+                        // https://lazyfoo.net/tutorials/SDL/27_collision_detection/index.php
+                        //
+                        // If entity is within collision bounds.
+                        // This doesn't necessarily mean a collision has happened,
+                        // which requires the below checks to be exact.
+                        if (currentLeft < collidableRight
+                            && currentRight > collidableLeft
+                            && currentBottom < collidableTop
+                            && currentTop > collidableBottom
+                        ) {
+                            // Collided into the left of the entity.
+                            if (previousRight <= collidableLeft) {
+                                if (!collider.ghosted) {
+                                    position.current.x = collidableLeft - size.width;
+                                    if (collider.bounce) velocity.reverseX();
+                                    else velocity.setZero();
+                                }
+                                handleCollision(entityId, collidableId);
+                            }
+                            // Collided into the right of the entity.
+                            else if (previousLeft >= collidableRight) {
+                                if (!collider.ghosted) {
+                                    position.current.x = collidableRight;
+                                    if (collider.bounce) velocity.reverseX();
+                                    else velocity.setZero();
+                                }
+                                handleCollision(entityId, collidableId);
+                            }
+                            // Collided into the bottom of the entity.
+                            else if (previousTop <= collidableBottom) {
+                                if (!collider.ghosted) {
+                                    position.current.y = collidableBottom - size.height;
+                                    if (collider.bounce) velocity.reverseY();
+                                    else velocity.setZero();
+                                }
+                                handleCollision(entityId, collidableId);
+                            }
+                            // Collided into the top of the entity.
+                            else if (previousBottom >= collidableTop) {
+                                if (!collider.ghosted) {
+                                    position.current.y = collidableTop;
+                                    if (collider.bounce) velocity.reverseY();
+                                    else velocity.setZero();
+                                }
+                                handleCollision(entityId, collidableId);
+                            }
                         }
-                        handleCollision(entityId, collidableId);
-                    }
-                    // Collided into the right of the entity.
-                    else if (previousLeft >= collidableRight) {
-                        if (!collider.ghosted) {
-                            position.current.x = collidableRight;
-                            if (collider.bounce) velocity.reverseX();
-                            else velocity.setZero();
-                        }
-                        handleCollision(entityId, collidableId);
-                    }
-                    // Collided into the bottom of the entity.
-                    else if (previousTop <= collidableBottom) {
-                        if (!collider.ghosted) {
-                            position.current.y = collidableBottom - size.height;
-                            if (collider.bounce) velocity.reverseY();
-                            else velocity.setZero();
-                        }
-                        handleCollision(entityId, collidableId);
-                    } else if (previousBottom >= collidableTop) {
-                        if (!collider.ghosted) {
-                            position.current.y = collidableTop;
-                            if (collider.bounce) velocity.reverseY();
-                            else velocity.setZero();
-                        }
-                        handleCollision(entityId, collidableId);
                     }
                 }
             }
         }
     }
 
-    /**
-     * Play the impact sound if it isn't on cooldown already.
-     */
     private void handleCollision(int colliderId, int collidableId) {
         // Play the impact sound if it isn't currently on cooldown.
         if (colliders.get(colliderId).playImpactSound && impactSounds.has(collidableId)) {
@@ -204,7 +250,7 @@ public final class MovementCollisionSystem extends LogicSystem {
             }
         }
 
-        // Run the collision listener function.
+        // Run the collision listener function for the collider and the collidable entities.
         if (collisionListeners.has(colliderId)) {
             var collisionListener = collisionListeners.get(colliderId);
             var currentTime = System.nanoTime();

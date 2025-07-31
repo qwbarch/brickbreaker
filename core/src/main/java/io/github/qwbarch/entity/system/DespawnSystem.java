@@ -33,7 +33,6 @@ public class DespawnSystem extends LogicSystem {
                 despawnable.onDespawn.run();
                 despawnable.onDespawn = null;
             }
-            System.out.println("despanwed");
             world.delete(entityId);
         }
     }

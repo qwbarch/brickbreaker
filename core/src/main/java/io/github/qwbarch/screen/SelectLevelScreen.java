@@ -14,14 +14,17 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Lazy;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
+import io.github.qwbarch.screen.level.BonusLevel;
 import io.github.qwbarch.screen.level.Level1Screen;
+import io.github.qwbarch.screen.level.Level2Screen;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
-public final class WinScreen implements Screen {
-    private static final String HEADER = "You won!";
+public final class SelectLevelScreen implements Screen {
+    private static final String HEADER = "Select a level";
 
     private final Viewport viewport = new ScreenViewport();
 
@@ -32,29 +35,24 @@ public final class WinScreen implements Screen {
     private final Stage stage;
     private final ScreenHandler screenHandler;
     private final Lazy<Level1Screen> level1Screen;
+    private final Lazy<Level2Screen> level2Screen;
+    private final Lazy<BonusLevel> bonusLevelScreen;
     private final Lazy<MenuScreen> menuScreen;
 
     private BitmapFont headerFont;
-    private BitmapFont bodyFont;
     private float headerWidth;
     private float headerHeight;
 
     @Inject
-    WinScreen(
-        InputMultiplexer inputMultiplexer,
-        AssetMap assets,
-        GlyphLayout glyphLayout,
-        SpriteBatch batch,
-        ScreenHandler screenHandler,
-        Lazy<Level1Screen> level1Screen,
-        Lazy<MenuScreen> menuScreen
-    ) {
+    SelectLevelScreen(InputMultiplexer inputMultiplexer, AssetMap assets, GlyphLayout glyphLayout, SpriteBatch batch, ScreenHandler screenHandler, Lazy<Level1Screen> level1Screen, Lazy<Level2Screen> level2Screen, Lazy<BonusLevel> bonusLevelScreen, Lazy<MenuScreen> menuScreen) {
         this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
         this.batch = batch;
         this.screenHandler = screenHandler;
         this.level1Screen = level1Screen;
+        this.level2Screen = level2Screen;
+        this.bonusLevelScreen = bonusLevelScreen;
         this.menuScreen = menuScreen;
         stage = new Stage(viewport, batch);
     }
@@ -66,11 +64,30 @@ public final class WinScreen implements Screen {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
 
-        var tryAgainButton = new MenuButton("Next level", assets);
-        tryAgainButton.addListener(new ClickListener() {
+        var level1Button = new MenuButton("Level 1", assets);
+        level1Button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                Objects.requireNonNull(level1Screen.get()).firstRun = true;
                 screenHandler.setScreen(level1Screen.get());
+            }
+        });
+
+        var level2Button = new MenuButton("Level 2", assets);
+        level2Button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Objects.requireNonNull(level2Screen.get()).firstRun = true;
+                screenHandler.setScreen(level2Screen.get());
+            }
+        });
+
+        var bonusLevelButton = new MenuButton("Bonus Level", assets);
+        bonusLevelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Objects.requireNonNull(bonusLevelScreen.get()).firstRun = true;
+                screenHandler.setScreen(bonusLevelScreen.get());
             }
         });
 
@@ -82,32 +99,22 @@ public final class WinScreen implements Screen {
             }
         });
 
-        var quitButton = new MenuButton("Quit game", assets);
-        quitButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
-            }
-        });
-
         var group = new VerticalGroup();
-        group.addActor(tryAgainButton);
+        group.addActor(level1Button);
+        group.addActor(level2Button);
+        group.addActor(bonusLevelButton);
         group.addActor(mainMenuButton);
-        group.addActor(quitButton);
 
         group.space(20f);
-        group.setPosition(
-            screenWidth / 2f,
-            screenHeight / 4f * 3.1f - headerHeight * 3f
-        );
+        group.setPosition(screenWidth / 2f, screenHeight / 4f * 3.1f - headerHeight * 3f);
 
         stage.addActor(group);
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     @Override
     public void show() {
         headerFont = assets.getHeaderFont();
-        bodyFont = assets.getBodyFont();
 
         glyphLayout.setText(headerFont, HEADER);
         headerWidth = glyphLayout.width;
@@ -144,12 +151,7 @@ public final class WinScreen implements Screen {
 
         batch.setProjectionMatrix(viewport.getCamera().combined);
         batch.begin();
-        headerFont.draw(
-            batch,
-            HEADER,
-            screenWidth / 2f - headerWidth / 2f,
-            screenHeight / 4f * 3.1f
-        );
+        headerFont.draw(batch, HEADER, screenWidth / 2f - headerWidth / 2f, screenHeight / 4f * 3.1f);
         batch.end();
 
         stage.act(Gdx.graphics.getDeltaTime());
