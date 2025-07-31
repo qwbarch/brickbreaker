@@ -32,6 +32,7 @@ public abstract class LevelScreen implements Screen {
     private BitmapFont headerFont;
     private float startLabelWidth;
     private float startLabelHeight;
+    private boolean firstRun = true;
 
     protected LevelScreen(
         String startLabel,
@@ -66,6 +67,7 @@ public abstract class LevelScreen implements Screen {
     public void show() {
         System.out.println("level screen show");
 
+        currentViewport = uiViewport;
         startTime = System.nanoTime();
         headerFont = assets.getHeaderFont();
 
@@ -121,7 +123,8 @@ public abstract class LevelScreen implements Screen {
 
         // Render start of round overlay.
         var currentTime = System.nanoTime();
-        if (currentTime - startTime < 3_000_000_000L) {
+        if (firstRun && currentTime - startTime < 3_000_000_000L) {
+            System.out.println("rendering this");
             currentViewport.apply();
             batch.setProjectionMatrix(currentViewport.getCamera().combined);
             batch.begin();
@@ -133,6 +136,7 @@ public abstract class LevelScreen implements Screen {
             );
             batch.end();
         } else {
+            firstRun = false;
             if (currentViewport == uiViewport) {
                 currentViewport = gameViewport;
                 currentViewport.apply();
