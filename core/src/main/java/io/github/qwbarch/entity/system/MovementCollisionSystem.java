@@ -45,6 +45,33 @@ public final class MovementCollisionSystem extends LogicSystem {
 
     private final int gridCellSize;
 
+    /**
+     * Used to iterate over all collidable entities.
+     */
+    private EntitySubscription collidableSubscription;
+
+    /**
+     * A pool of buckets for the spatial grid to avoid unnecessary heap allocations.
+     */
+    private final Pool<IntBag> bucketPool = new Pool<>() {
+        @Override
+        protected IntBag newObject() {
+            return new IntBag();
+        }
+    };
+
+    /**
+     * Used for splitting up the world into a grid of cells.
+     * Collision detection is only performed on the closest cells of the collider.
+     */
+    private final LongMap<IntBag> spatialGrid = new LongMap<>();
+
+    /**
+     * Keeps tracked of collision detection tested entities
+     * to avoid duplicating work.
+     */
+    private final IntSet detectedEntities = new IntSet();
+
     // Component mappers are automatically injected via artemis-odb,
     // which gives access to the entity's components.
     private ComponentMapper<Position> positions;
@@ -54,17 +81,6 @@ public final class MovementCollisionSystem extends LogicSystem {
     private ComponentMapper<Collidable> collidables;
     private ComponentMapper<CollisionListener> collisionListeners;
     private ComponentMapper<ImpactSound> impactSounds;
-
-    /**
-     * Used to iterate over all collidable entities.
-     */
-    private EntitySubscription collidableSubscription;
-
-    /**
-     * Used for splitting up the world into a grid of cells.
-     * Collision detection is only performed on the closest cells of the collider.
-     */
-    private final LongMap<IntBag> spatialGrid = new LongMap<>();
 
     @Inject
     public MovementCollisionSystem(
@@ -87,9 +103,15 @@ public final class MovementCollisionSystem extends LogicSystem {
     protected void begin() {
         var collidableEntities = collidableSubscription.getEntities();
 
+        // Return the buckets to the pool before clearing.
+        for (var bucket : spatialGrid) {
+            bucket.value.clear();
+            bucketPool.free(bucket.value);
+        }
+        spatialGrid.clear();
+
         // Re-calculate the available collidable entities for the spatial
         // grid on every game tick.
-        spatialGrid.clear();
         for (var i = 0; i < collidableEntities.size(); i++) {
             int entityId = collidableEntities.get(i);
             if (!collidables.has(entityId)) continue;
@@ -109,7 +131,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                     var key = (((long) cellX) << 32) | (cellY & 0xffffffffL);
                     var bag = spatialGrid.get(key);
                     if (bag == null) {
-                        bag = new IntBag();
+                        bag = bucketPool.obtain();
                         spatialGrid.put(key, bag);
                     }
                     bag.add(entityId);
@@ -158,8 +180,7 @@ public final class MovementCollisionSystem extends LogicSystem {
             var minCellY = (int) Math.floor(currentBottom / gridCellSize);
             var maxCellY = (int) Math.floor(currentTop / gridCellSize);
 
-            // Track tested collidable entities to avoid duplicate tests.
-            var collidableTested = new IntSet();
+            detectedEntities.clear();
 
             // Check for collisions over overlapping cells.
             for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
@@ -171,7 +192,7 @@ public final class MovementCollisionSystem extends LogicSystem {
                     for (var i = 0; i < bucket.size(); i++) {
                         var collidableId = bucket.get(i);
 
-                        if (!collidableTested.add(collidableId)) continue;
+                        if (!detectedEntities.add(collidableId)) continue;
                         if (!collidables.has(collidableId)) continue;
 
                         var collidablePosition = positions.get(collidableId).current;
