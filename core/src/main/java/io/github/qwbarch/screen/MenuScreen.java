@@ -10,9 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import dagger.Lazy;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.screen.level.Level1Screen;
+import io.github.qwbarch.screen.level.Level2Screen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -23,6 +25,7 @@ public final class MenuScreen implements Screen {
     private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;
+    private final Screen level2Screen;
     private final Screen instructionScreen;
     private final AssetMap assets;
     private final SpriteBatch batch;
@@ -46,6 +49,7 @@ public final class MenuScreen implements Screen {
         InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
         Level1Screen level1Screen,
+        Level2Screen level2Screen,
         InstructionScreen instructionScreen,
         AssetMap assets,
         SpriteBatch batch,
@@ -58,6 +62,7 @@ public final class MenuScreen implements Screen {
         this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
         this.level1Screen = level1Screen;
+        this.level2Screen = level2Screen;
         this.instructionScreen = instructionScreen;
         this.assets = assets;
         this.batch = batch;
@@ -81,7 +86,7 @@ public final class MenuScreen implements Screen {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screenHandler.setScreen(level1Screen);
+                screenHandler.setScreen(level2Screen);
             }
         });
 

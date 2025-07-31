@@ -228,7 +228,6 @@ public abstract class LevelScreen implements Screen {
         // Render start of round overlay.
         var currentTime = System.nanoTime();
         if (firstRun && currentTime - startTime < 3_000_000_000L) {
-            System.out.println("rendering this");
             currentViewport.apply();
             batch.setProjectionMatrix(currentViewport.getCamera().combined);
             batch.begin();
