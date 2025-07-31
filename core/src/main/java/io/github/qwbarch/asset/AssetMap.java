@@ -26,6 +26,7 @@ public final class AssetMap implements Disposable {
     private static final String GREEN_BRICK_TEXTURE_PATH = "green-brick.jpg";
 
     private static final String BACKGROUND_MUSIC_PATH = "background-music.mp3";
+    private static final String GAME_OVER_SOUND_PATH = "game-over.wav";
 
     private static final String BALL_SPAWN_SOUND_PATH = "ball-spawn.wav";
     private static final String HARD_BOUNCE_SOUND_PATH = "hard-bounce.mp3";
@@ -67,6 +68,7 @@ public final class AssetMap implements Disposable {
             assetManager.load(GREEN_BRICK_TEXTURE_PATH, Texture.class);
 
             assetManager.load(BACKGROUND_MUSIC_PATH, Sound.class);
+            assetManager.load(GAME_OVER_SOUND_PATH, Sound.class);
             assetManager.load(BALL_SPAWN_SOUND_PATH, Sound.class);
             assetManager.load(HARD_BOUNCE_SOUND_PATH, Sound.class);
             assetManager.load(SOFT_BOUNCE_SOUND_PATH, Sound.class);
@@ -150,6 +152,10 @@ public final class AssetMap implements Disposable {
 
     public Sound getBackgroundMusic() {
         return assetManager.get(BACKGROUND_MUSIC_PATH, Sound.class);
+    }
+
+    public Sound getGameOverSound() {
+        return assetManager.get(GAME_OVER_SOUND_PATH, Sound.class);
     }
 
     public Sound getBallSpawnSound() {

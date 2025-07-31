@@ -112,8 +112,10 @@ public final class WinScreen implements Screen {
 
     @Override
     public void show() {
-        var resolver = Objects.requireNonNull(levelResolver.get());
+        assets.getGameOverSound().play();
+
         // Only save if not the bonus level and if the played level is the save file level as well.
+        var resolver = Objects.requireNonNull(levelResolver.get());
         if (
             resolver.currentSave.level() != LevelResolver.Level.BONUS_LEVEL
                 && resolver.currentSave.level() == resolver.currentlyPlaying

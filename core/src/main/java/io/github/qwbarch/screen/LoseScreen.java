@@ -106,6 +106,7 @@ public final class LoseScreen implements Screen {
 
     @Override
     public void show() {
+        assets.getGameOverSound().play();
         headerFont = assets.getHeaderFont();
 
         glyphLayout.setText(headerFont, HEADER);
