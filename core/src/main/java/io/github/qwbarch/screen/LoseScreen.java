@@ -12,12 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.screen.level.Level1Screen;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
 public final class LoseScreen implements Screen {
@@ -25,36 +26,35 @@ public final class LoseScreen implements Screen {
 
     private final Viewport viewport = new ScreenViewport();
 
+    private final Lazy<LevelResolver> levelResolver;
     private final InputMultiplexer inputMultiplexer;
     private final AssetMap assets;
     private final GlyphLayout glyphLayout;
     private final SpriteBatch batch;
     private final Stage stage;
     private final ScreenHandler screenHandler;
-    private final Lazy<Level1Screen> level1Screen;
     private final Lazy<MenuScreen> menuScreen;
 
     private BitmapFont headerFont;
-    private BitmapFont bodyFont;
     private float headerWidth;
     private float headerHeight;
 
     @Inject
     LoseScreen(
+        Lazy<LevelResolver> levelResolver,
         InputMultiplexer inputMultiplexer,
         AssetMap assets,
         GlyphLayout glyphLayout,
         SpriteBatch batch,
         ScreenHandler screenHandler,
-        Lazy<Level1Screen> level1Screen,
         Lazy<MenuScreen> menuScreen
     ) {
+        this.levelResolver = levelResolver;
         this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
         this.batch = batch;
         this.screenHandler = screenHandler;
-        this.level1Screen = level1Screen;
         this.menuScreen = menuScreen;
         stage = new Stage(viewport, batch);
     }
@@ -70,7 +70,7 @@ public final class LoseScreen implements Screen {
         tryAgainButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screenHandler.setScreen(level1Screen.get());
+                screenHandler.setScreen(Objects.requireNonNull(levelResolver.get()).getCurrentlyPlayingLevelScreen());
             }
         });
 
@@ -107,7 +107,6 @@ public final class LoseScreen implements Screen {
     @Override
     public void show() {
         headerFont = assets.getHeaderFont();
-        bodyFont = assets.getBodyFont();
 
         glyphLayout.setText(headerFont, HEADER);
         headerWidth = glyphLayout.width;

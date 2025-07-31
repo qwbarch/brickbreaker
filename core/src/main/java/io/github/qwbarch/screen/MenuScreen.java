@@ -10,18 +10,22 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.screen.level.BonusLevel;
+import io.github.qwbarch.screen.level.BonusLevelScreen;
 import io.github.qwbarch.screen.level.Level1Screen;
 import io.github.qwbarch.screen.level.Level2Screen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
 public final class MenuScreen implements Screen {
+    private final Lazy<LevelResolver> levelResolver;
     private final InputMultiplexer inputMultiplexer;
     private final ScreenHandler screenHandler;
     private final Screen level1Screen;
@@ -48,11 +52,12 @@ public final class MenuScreen implements Screen {
 
     @Inject
     MenuScreen(
+        Lazy<LevelResolver> levelResolver,
         InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
         Level1Screen level1Screen,
         Level2Screen level2Screen,
-        BonusLevel bonusLevelScreen,
+        BonusLevelScreen bonusLevelScreen,
         InstructionScreen instructionScreen,
         SelectLevelScreen selectLevelScreen,
         AssetMap assets,
@@ -63,6 +68,7 @@ public final class MenuScreen implements Screen {
         @Named("logo") String logo
     ) {
         System.out.println("MenuScreen constructor");
+        this.levelResolver = levelResolver;
         this.inputMultiplexer = inputMultiplexer;
         this.screenHandler = screenHandler;
         this.level1Screen = level1Screen;
@@ -93,8 +99,9 @@ public final class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("play game pressed");
-                bonusLevelScreen.firstRun = true;
-                screenHandler.setScreen(bonusLevelScreen);
+                var screen = Objects.requireNonNull(levelResolver.get()).getCurrentSaveLevelScreen();
+                screen.firstRun = true;
+                screenHandler.setScreen(screen);
             }
         });
 

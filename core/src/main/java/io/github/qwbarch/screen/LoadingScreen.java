@@ -3,15 +3,18 @@ package io.github.qwbarch.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.holidaystudios.tools.GifDecoder;
+import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.asset.AssetMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Objects;
 
 public final class LoadingScreen implements Screen {
     private final Animation<TextureRegion> loadingAnimation;
 
+    private final Lazy<LevelResolver> levelResolver;
     private final SpriteBatch batch;
     private final ScreenHandler screenHandler;
     private final Screen menuScreen;
@@ -29,6 +32,7 @@ public final class LoadingScreen implements Screen {
 
     @Inject
     LoadingScreen(
+        Lazy<LevelResolver> levelResolver,
         ScreenHandler screenHandler,
         GlyphLayout glyphLayout,
         MenuScreen menuScreen,
@@ -38,6 +42,7 @@ public final class LoadingScreen implements Screen {
         @Named("rightLogo") String rightLogo,
         @Named("logo") String logo
     ) {
+        this.levelResolver = levelResolver;
         this.batch = batch;
         this.screenHandler = screenHandler;
         this.menuScreen = menuScreen;
@@ -109,6 +114,9 @@ public final class LoadingScreen implements Screen {
         } else {
             assets.update();
             if (assets.isFinishedLoading()) {
+                var resolver = Objects.requireNonNull(levelResolver.get());
+                resolver.loadSave();
+                System.out.println("level: " + resolver.currentSave);
                 screenHandler.setScreen(menuScreen);
             }
         }

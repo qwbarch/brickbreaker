@@ -23,7 +23,7 @@ public class Main implements ApplicationListener {
         Color.valueOf("#525252"); // Gray color.
 
     /**
-     * Update the game's logic at a fixed 30 updates per second.
+     * Update the game's logic at a fixed 60 updates per second.
      */
     private final static float SECONDS_PER_TICK = 1f / 60f;
 
@@ -110,7 +110,7 @@ public class Main implements ApplicationListener {
     /**
      * Chance to spawn a ball from hitting a brick.
      */
-    private static final float SPAWN_BALL_CHANCE = 0.3f;
+    private static final float SPAWN_BALL_CHANCE = 0.25f;
 
     /**
      * The cell size of the spatial grid used for collision detection.
@@ -166,7 +166,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        //fpsLogger.log();
+        fpsLogger.log();
         ScreenUtils.clear(MAIN_BACKGROUND_COLOR);
         screenHandler.getCurrentScreen().render();
     }

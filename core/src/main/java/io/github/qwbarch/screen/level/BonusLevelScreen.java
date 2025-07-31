@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.EntitySpawner;
 import io.github.qwbarch.screen.LevelScreen;
@@ -15,16 +16,18 @@ import io.github.qwbarch.screen.ScreenHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
-public class BonusLevel extends LevelScreen {
+public class BonusLevelScreen extends LevelScreen {
     private static final String START_LABEL = "Bonus level\n\nThat's a lot of balls.";
 
     private final float brickSize;
     private final EntitySpawner spawner;
+    private final Lazy<LevelResolver> levelResolver;
 
     @Inject
-    protected BonusLevel(
+    protected BonusLevelScreen(
         World world,
         SpriteBatch batch,
         EntitySpawner spawner,
@@ -36,7 +39,8 @@ public class BonusLevel extends LevelScreen {
         GlyphLayout glyphLayout,
         InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
-        Lazy<MenuScreen> menuScreen
+        Lazy<MenuScreen> menuScreen,
+        Lazy<LevelResolver> levelResolver
     ) {
         super(
             START_LABEL,
@@ -54,11 +58,14 @@ public class BonusLevel extends LevelScreen {
         );
         this.brickSize = brickSize;
         this.spawner = spawner;
+        this.levelResolver = levelResolver;
     }
 
     @Override
     public void show() {
         super.show();
+
+        Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.BONUS_LEVEL;
         System.out.println("bonus level show");
 
         var brickHealth = 700;

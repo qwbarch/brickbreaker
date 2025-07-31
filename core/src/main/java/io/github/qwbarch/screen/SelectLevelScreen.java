@@ -2,19 +2,22 @@ package io.github.qwbarch.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
-import io.github.qwbarch.screen.level.BonusLevel;
+import io.github.qwbarch.screen.level.BonusLevelScreen;
 import io.github.qwbarch.screen.level.Level1Screen;
 import io.github.qwbarch.screen.level.Level2Screen;
 
@@ -36,15 +39,16 @@ public final class SelectLevelScreen implements Screen {
     private final ScreenHandler screenHandler;
     private final Lazy<Level1Screen> level1Screen;
     private final Lazy<Level2Screen> level2Screen;
-    private final Lazy<BonusLevel> bonusLevelScreen;
+    private final Lazy<BonusLevelScreen> bonusLevelScreen;
     private final Lazy<MenuScreen> menuScreen;
+    private final Lazy<LevelResolver> levelResolver;
 
     private BitmapFont headerFont;
     private float headerWidth;
     private float headerHeight;
 
     @Inject
-    SelectLevelScreen(InputMultiplexer inputMultiplexer, AssetMap assets, GlyphLayout glyphLayout, SpriteBatch batch, ScreenHandler screenHandler, Lazy<Level1Screen> level1Screen, Lazy<Level2Screen> level2Screen, Lazy<BonusLevel> bonusLevelScreen, Lazy<MenuScreen> menuScreen) {
+    SelectLevelScreen(InputMultiplexer inputMultiplexer, AssetMap assets, GlyphLayout glyphLayout, SpriteBatch batch, ScreenHandler screenHandler, Lazy<Level1Screen> level1Screen, Lazy<Level2Screen> level2Screen, Lazy<BonusLevelScreen> bonusLevelScreen, Lazy<MenuScreen> menuScreen, Lazy<LevelResolver> levelResolver) {
         this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
@@ -54,6 +58,7 @@ public final class SelectLevelScreen implements Screen {
         this.level2Screen = level2Screen;
         this.bonusLevelScreen = bonusLevelScreen;
         this.menuScreen = menuScreen;
+        this.levelResolver = levelResolver;
         stage = new Stage(viewport, batch);
     }
 
@@ -63,6 +68,9 @@ public final class SelectLevelScreen implements Screen {
 
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
+
+        var resolver = Objects.requireNonNull(levelResolver.get());
+        var level = resolver.currentSave.level();
 
         var level1Button = new MenuButton("Level 1", assets);
         level1Button.addListener(new ClickListener() {
@@ -90,6 +98,14 @@ public final class SelectLevelScreen implements Screen {
                 screenHandler.setScreen(bonusLevelScreen.get());
             }
         });
+
+        // Bonus level is for-fun, unlock it after level 1 is completed.
+        if (level == LevelResolver.Level.LEVEL_1) {
+            level2Button.setColor(Color.GRAY);
+            level2Button.setTouchable(Touchable.disabled);
+            bonusLevelButton.setColor(Color.GRAY);
+            bonusLevelButton.setTouchable(Touchable.disabled);
+        }
 
         var mainMenuButton = new MenuButton("Main Menu", assets);
         mainMenuButton.addListener(new ClickListener() {

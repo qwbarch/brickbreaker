@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.EntitySpawner;
 import io.github.qwbarch.screen.LevelScreen;
@@ -15,6 +16,7 @@ import io.github.qwbarch.screen.ScreenHandler;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
 public class Level2Screen extends LevelScreen {
@@ -22,6 +24,7 @@ public class Level2Screen extends LevelScreen {
 
     private final EntitySpawner spawner;
     private final float brickSize;
+    private final Lazy<LevelResolver> levelResolver;
 
     @Inject
     Level2Screen(
@@ -36,7 +39,8 @@ public class Level2Screen extends LevelScreen {
         InputMultiplexer inputMultiplexer,
         ScreenHandler screenHandler,
         Lazy<MenuScreen> menuScreen,
-        @Named("brickSize") float brickSize
+        @Named("brickSize") float brickSize,
+        Lazy<LevelResolver> levelResolver
     ) {
         super(
             START_LABEL,
@@ -55,11 +59,14 @@ public class Level2Screen extends LevelScreen {
         System.out.println("level 1 constructor");
         this.spawner = spawner;
         this.brickSize = brickSize;
+        this.levelResolver = levelResolver;
     }
 
     @Override
     public void show() {
         super.show();
+
+        Objects.requireNonNull(levelResolver.get()).currentlyPlaying = LevelResolver.Level.LEVEL_2;
 
         // Left grey bricks.
         for (var i = 4; i < 19; i++) {
@@ -100,14 +107,14 @@ public class Level2Screen extends LevelScreen {
         // Left green bricks.
         for (var i = 13; i < 25; i++) {
             for (var j = 0; j < 3; j++) {
-                spawner.spawnBrick(j * brickSize, i * brickSize, 10);
+                spawner.spawnBrick(j * brickSize, i * brickSize, 3);
             }
         }
 
         // Right green bricks.
         for (var i = 13; i < 25; i++) {
             for (var j = 27; j < 30; j++) {
-                spawner.spawnBrick(j * brickSize, i * brickSize, 10);
+                spawner.spawnBrick(j * brickSize, i * brickSize, 3);
             }
         }
 

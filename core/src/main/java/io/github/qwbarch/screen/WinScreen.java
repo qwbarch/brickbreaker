@@ -12,12 +12,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Lazy;
+import io.github.qwbarch.LevelResolver;
 import io.github.qwbarch.MenuButton;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.screen.level.Level1Screen;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Objects;
 
 @Singleton
 public final class WinScreen implements Screen {
@@ -25,6 +27,7 @@ public final class WinScreen implements Screen {
 
     private final Viewport viewport = new ScreenViewport();
 
+    private final Lazy<LevelResolver> levelResolver;
     private final InputMultiplexer inputMultiplexer;
     private final AssetMap assets;
     private final GlyphLayout glyphLayout;
@@ -35,12 +38,12 @@ public final class WinScreen implements Screen {
     private final Lazy<MenuScreen> menuScreen;
 
     private BitmapFont headerFont;
-    private BitmapFont bodyFont;
     private float headerWidth;
     private float headerHeight;
 
     @Inject
     WinScreen(
+        Lazy<LevelResolver> levelResolver,
         InputMultiplexer inputMultiplexer,
         AssetMap assets,
         GlyphLayout glyphLayout,
@@ -49,6 +52,7 @@ public final class WinScreen implements Screen {
         Lazy<Level1Screen> level1Screen,
         Lazy<MenuScreen> menuScreen
     ) {
+        this.levelResolver = levelResolver;
         this.inputMultiplexer = inputMultiplexer;
         this.assets = assets;
         this.glyphLayout = glyphLayout;
@@ -66,11 +70,13 @@ public final class WinScreen implements Screen {
         var screenWidth = Gdx.graphics.getWidth();
         var screenHeight = Gdx.graphics.getHeight();
 
+        var resolver = Objects.requireNonNull(levelResolver.get());
+
         var tryAgainButton = new MenuButton("Next level", assets);
         tryAgainButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screenHandler.setScreen(level1Screen.get());
+                screenHandler.setScreen(resolver.getCurrentSaveLevelScreen());
             }
         });
 
@@ -106,8 +112,22 @@ public final class WinScreen implements Screen {
 
     @Override
     public void show() {
+        var resolver = Objects.requireNonNull(levelResolver.get());
+        // Only save if not the bonus level and if the played level is the save file level as well.
+        if (
+            resolver.currentSave.level() != LevelResolver.Level.BONUS_LEVEL
+                && resolver.currentSave.level() == resolver.currentlyPlaying
+        ) {
+            // Set the save file to the next level.
+            resolver.currentSave = new LevelResolver.LevelSave(
+                LevelResolver.Level.values()[resolver.currentSave.level().ordinal() + 1]
+            );
+
+            // Save the file.
+            resolver.saveFile();
+        }
+
         headerFont = assets.getHeaderFont();
-        bodyFont = assets.getBodyFont();
 
         glyphLayout.setText(headerFont, HEADER);
         headerWidth = glyphLayout.width;
