@@ -2,9 +2,11 @@ package io.github.qwbarch.screen.level;
 
 import com.artemis.World;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ObjectSet;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.EntitySpawner;
 import io.github.qwbarch.screen.LevelScreen;
 
@@ -14,6 +16,8 @@ import javax.inject.Singleton;
 
 @Singleton
 public final class Level1Screen extends LevelScreen {
+    private static final String START_LABEL = "Level 1\n\nYou don't know what\nyou're getting into.";
+
     private final EntitySpawner spawner;
     private final float brickSize;
     private final float worldHeight;
@@ -26,9 +30,11 @@ public final class Level1Screen extends LevelScreen {
         @Named("worldWidth") float worldWidth,
         @Named("worldHeight") float worldHeight,
         @Named("brickSize") float brickSize,
-        @Named("worldBackground") Color worldBackground
+        @Named("worldBackground") Color worldBackground,
+        AssetMap assets,
+        GlyphLayout glyphLayout
     ) {
-        super(world, batch, spawner, worldWidth, worldHeight, worldBackground);
+        super(START_LABEL, world, batch, spawner, worldWidth, worldHeight, worldBackground, assets, glyphLayout);
         System.out.println("level 1 constructor");
         this.brickSize = brickSize;
         this.spawner = spawner;

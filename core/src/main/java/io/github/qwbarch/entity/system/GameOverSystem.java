@@ -76,7 +76,7 @@ public class GameOverSystem extends BaseSystem {
 
     @Override
     protected void processSystem() {
-        screenHandler.setScreen(winScreen);
+        //screenHandler.setScreen(winScreen);
 
         if (remainingTargets == 0) {
             System.out.println("win");

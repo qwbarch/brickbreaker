@@ -4,12 +4,17 @@ import com.artemis.Aspect;
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.EntitySpawner;
 
 public abstract class LevelScreen implements Screen {
+    private final String startLabel;
     private final World world;
     private final SpriteBatch batch;
     private final EntitySpawner spawner;
@@ -17,23 +22,39 @@ public abstract class LevelScreen implements Screen {
     private final float worldHeight;
     private final Texture background;
     private final Camera camera = new OrthographicCamera();
-    private final Viewport viewport;
+    private final Viewport gameViewport;
+    private final Viewport uiViewport = new ScreenViewport();
+    private final AssetMap assets;
+    private final GlyphLayout glyphLayout;
+
+    private long startTime;
+    private Viewport currentViewport;
+    private BitmapFont headerFont;
+    private float startLabelWidth;
+    private float startLabelHeight;
 
     protected LevelScreen(
+        String startLabel,
         World world,
         SpriteBatch batch,
         EntitySpawner spawner,
         float worldWidth,
         float worldHeight,
-        Color worldBackground
+        Color worldBackground,
+        AssetMap assets,
+        GlyphLayout glyphLayout
     ) {
         System.out.println("LevelScreen constructor");
+        this.startLabel = startLabel;
         this.world = world;
         this.batch = batch;
         this.spawner = spawner;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
-        viewport = new FitViewport(worldWidth, worldHeight, camera);
+        this.assets = assets;
+        this.glyphLayout = glyphLayout;
+        gameViewport = new FitViewport(worldWidth, worldHeight, camera);
+        currentViewport = uiViewport;
 
         var pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(worldBackground);
@@ -44,6 +65,14 @@ public abstract class LevelScreen implements Screen {
     @Override
     public void show() {
         System.out.println("level screen show");
+
+        startTime = System.nanoTime();
+        headerFont = assets.getHeaderFont();
+
+        glyphLayout.setText(headerFont, startLabel);
+        startLabelWidth = glyphLayout.width;
+        startLabelHeight = glyphLayout.height;
+
         var borderSize = 100f;
         spawner.spawnInvisibleBorder(
             -borderSize,
@@ -67,7 +96,7 @@ public abstract class LevelScreen implements Screen {
         spawner.spawnStartingBall();
 
         // Center the camera.
-        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        currentViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     @Override
@@ -82,34 +111,44 @@ public abstract class LevelScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        currentViewport.update(width, height, true);
     }
 
     @Override
     public void render() {
-        // accumulator += Gdx.graphics.getDeltaTime();
-        // if (spawnedBalls < 1 && accumulator >= 0.0001f) {
-        //     accumulator -= 0.0001f;
-        //     spawnedBalls++;
-        //     var reflect = MathUtils.random(1) == 0;
-        //     var xVel = (float) MathUtils.random(80, 160);
-        //     var yVel = (float) MathUtils.random(100, 160);
-        //     xVel = reflect ? xVel : -xVel;
-        //     xVel *= .9f;
-        //     yVel *= .9f;
-        //     spawner.spawnBall(worldWidth / 2f, worldHeight / 2f, xVel, yVel);
-        // }
-        //viewport.apply();
-        //camera.update();
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
+        var screenWidth = Gdx.graphics.getWidth();
+        var screenHeight = Gdx.graphics.getHeight();
 
-        batch.draw(background, 0, 0, worldWidth, worldHeight);
+        // Render start of round overlay.
+        var currentTime = System.nanoTime();
+        if (currentTime - startTime < 3_000_000_000L) {
+            currentViewport.apply();
+            batch.setProjectionMatrix(currentViewport.getCamera().combined);
+            batch.begin();
+            headerFont.draw(
+                batch,
+                startLabel,
+                screenWidth / 2f - startLabelWidth / 2f,
+                screenHeight / 4f * 3f
+            );
+            batch.end();
+        } else {
+            if (currentViewport == uiViewport) {
+                currentViewport = gameViewport;
+                currentViewport.apply();
+                currentViewport.update(Gdx.graphics.getWidth() , Gdx.graphics.getHeight(), true);
+            }
 
-        // batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
-        world.process();
+            batch.setProjectionMatrix(camera.combined);
+            batch.begin();
 
-        batch.end();
+            batch.draw(background, 0, 0, worldWidth, worldHeight);
+
+            // batch.draw(ballTexture, WORLD_WIDTH / 2f - 20, WORLD_HEIGHT / 2f - 20, 1.21f, 1.21f);
+            world.process();
+
+            batch.end();
+        }
     }
 
     private void clearWorld() {
