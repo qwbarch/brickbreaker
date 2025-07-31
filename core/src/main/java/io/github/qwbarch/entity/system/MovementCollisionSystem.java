@@ -5,8 +5,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.EntitySubscription;
 import com.artemis.annotations.All;
 import com.artemis.utils.IntBag;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import io.github.qwbarch.entity.component.*;
 
 import javax.inject.Inject;
@@ -65,7 +64,7 @@ public final class MovementCollisionSystem extends LogicSystem {
      * Used for splitting up the world into a grid of cells.
      * Collision detection is only performed on the closest cells of the collider.
      */
-    private final ObjectMap<Long, IntBag> spatialGrid = new ObjectMap<>();
+    private final LongMap<IntBag> spatialGrid = new LongMap<>();
 
     @Inject
     public MovementCollisionSystem(
@@ -105,6 +104,8 @@ public final class MovementCollisionSystem extends LogicSystem {
             // Store the collidable entities in their respective cells.
             for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
                 for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
+                    // Store cellX and cellY into a single long key:
+                    // https://stackoverflow.com/questions/12772939/java-storing-two-ints-in-a-long
                     var key = (((long) cellX) << 32) | (cellY & 0xffffffffL);
                     var bag = spatialGrid.get(key);
                     if (bag == null) {
@@ -158,13 +159,11 @@ public final class MovementCollisionSystem extends LogicSystem {
             var maxCellY = (int) Math.floor(currentTop / gridCellSize);
 
             // Track tested collidable entities to avoid duplicate tests.
-            var collidableTested = new ObjectSet<>();
+            var collidableTested = new IntSet();
 
             // Check for collisions over overlapping cells.
             for (int cellX = minCellX; cellX <= maxCellX; cellX++) {
                 for (int cellY = minCellY; cellY <= maxCellY; cellY++) {
-                    // Store the two cells as a single long value:
-                    // https://stackoverflow.com/questions/12772939/java-storing-two-ints-in-a-long
                     var key = (((long) cellX) << 32L) | (cellY & 0xffffffffL);
                     var bucket = spatialGrid.get(key);
                     if (bucket == null) continue;
