@@ -196,5 +196,25 @@ public final class Level1Screen extends LevelScreen {
                 );
             }
         }
+
+        // Left side of grey bricks.
+        for (var i = 0; i < 12; i++) {
+            if (i < 2 || i > 3) {
+                spawner.spawnBrick(brickSize, i * brickSize);
+            }
+        }
+
+        // Right side of grey bricks.
+        for (var i = 0; i < 12; i++) {
+            if (i < 2 || i > 3) {
+                spawner.spawnBrick(brickSize * 28, i * brickSize);
+            }
+        }
+
+        // Bottom side of grey bricks.
+        for (var i = 1; i < 28; i++) {
+            if (i >= 4 && i <= 6 || i >= 22 && i <= 25) continue;
+            spawner.spawnBrick(i * brickSize, 0);
+        }
     }
 }

@@ -25,6 +25,11 @@ public class PlayerHealthSystem extends BaseSystem  {
 
     private int totalHealth;
 
+    /**
+     * Only polls for game over condition if this is set to true.
+     */
+    public boolean isReady = false;
+
     @Inject
     PlayerHealthSystem(
         ScreenHandler screenHandler,
@@ -44,18 +49,22 @@ public class PlayerHealthSystem extends BaseSystem  {
             @Override
             public void inserted(IntBag intBag) {
                 totalHealth++;
+                System.out.println("+ player health: " + totalHealth);
             }
 
             @Override
             public void removed(IntBag intBag) {
                 totalHealth--;
+                System.out.println("- player health: " + totalHealth);
             }
         });
     }
 
     @Override
     protected void processSystem() {
-        if (totalHealth == 0) {
+        if (isReady && totalHealth <= 0) {
+            isReady = false;
+            totalHealth = 0;
             System.out.println("game over");
             screenHandler.setScreen(gameOverScreen);
             screenHandler.remove(level1Screen.get());

@@ -110,7 +110,7 @@ public class Main implements ApplicationListener {
     /**
      * Chance to spawn a ball from hitting a brick.
      */
-    private static final float SPAWN_BALL_CHANCE = 0.1f;
+    private static final float SPAWN_BALL_CHANCE = 1f;
 
     private final FPSLogger fpsLogger = new FPSLogger();
 

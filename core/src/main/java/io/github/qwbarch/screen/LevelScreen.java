@@ -1,7 +1,6 @@
 package io.github.qwbarch.screen;
 
 import com.artemis.Aspect;
-import com.artemis.EntitySubscription;
 import com.artemis.World;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.qwbarch.entity.EntitySpawner;
-import io.github.qwbarch.entity.component.InputListener;
 
 public abstract class LevelScreen implements Screen {
     private final World world;
