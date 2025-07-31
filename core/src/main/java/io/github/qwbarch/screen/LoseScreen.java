@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public final class GameOverScreen implements Screen {
+public final class LoseScreen implements Screen {
     private static final String HEADER = "You died. Game over!";
 
     private final Viewport viewport = new ScreenViewport();
@@ -40,7 +40,7 @@ public final class GameOverScreen implements Screen {
     private float headerHeight;
 
     @Inject
-    GameOverScreen(
+    LoseScreen(
         InputMultiplexer inputMultiplexer,
         AssetMap assets,
         GlyphLayout glyphLayout,

@@ -25,7 +25,7 @@ public final class Module {
         MovementCollisionSystem movementCollisionSystem,
         InputSystem inputSystem,
         DespawnSystem despawnSystem,
-        PlayerHealthSystem playerHealthSystem
+        GameOverSystem gameOverSystem
     ) {
         System.out.println("provideWorld");
         return new World(
@@ -33,7 +33,7 @@ public final class Module {
                 .with(inputSystem)
                 .with(movementCollisionSystem)
                 .with(despawnSystem)
-                .with(playerHealthSystem)
+                .with(gameOverSystem)
                 .with(renderSystem)
                 .register(strategy)
                 .build()

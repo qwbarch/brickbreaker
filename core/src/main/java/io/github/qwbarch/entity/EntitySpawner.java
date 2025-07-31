@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.IntSet;
 import io.github.qwbarch.asset.AssetMap;
 import io.github.qwbarch.entity.component.*;
-import io.github.qwbarch.entity.system.PlayerHealthSystem;
+import io.github.qwbarch.entity.system.GameOverSystem;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 public final class EntitySpawner {
     private final World world;
     private final AssetMap assets;
-    private final PlayerHealthSystem playerHealthSystem;
+    private final GameOverSystem playerHealthSystem;
     private final float brickSize;
     private final float ballSize;
     private final float ballVelocity;
@@ -36,7 +36,7 @@ public final class EntitySpawner {
     EntitySpawner(
         World world,
         AssetMap assets,
-        PlayerHealthSystem playerHealthSystem,
+        GameOverSystem playerHealthSystem,
         @Named("paddleVelocity") float paddleVelocity,
         @Named("paddleSpawnX") float paddleSpawnX,
         @Named("paddleSpawnY") float paddleSpawnY,
@@ -182,8 +182,6 @@ public final class EntitySpawner {
                     collider.ghosted = false;
                     collider.bounce = true;
                     collider.playImpactSound = true;
-
-                    playerHealthSystem.isReady = true;
                 }
 
                 return false;
@@ -283,6 +281,10 @@ public final class EntitySpawner {
         var collisionListener = world.edit(entityId).create(CollisionListener.class);
         var hitpoints = world.edit(entityId).create(Hitpoints.class);
         world.edit(entityId).create(Collidable.class);
+
+        if (startHitpoints > 0) {
+            world.edit(entityId).create(Target.class);
+        }
 
         position.current.set(x, y);
         position.previous.set(position.current);
